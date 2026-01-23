@@ -92,9 +92,6 @@ class FretNoteComponent extends HTMLElement {
         FretNoteComponent.instances.forEach((note) => {
             if (active) {
                 note._updateInScaleState();
-                note.setAttribute('scale-peek', '');
-            } else {
-                note.removeAttribute('scale-peek');
             }
             if (note._applyScalePeekState) {
                 note._applyScalePeekState();
@@ -153,9 +150,6 @@ class FretNoteComponent extends HTMLElement {
 
     async connectedCallback() {
         FretNoteComponent.instances.add(this);
-        if (FretNoteComponent.scalePeekActive) {
-            this.setAttribute('scale-peek', '');
-        }
 
         // Load template if not already loaded (singleton pattern)
         if (!FretNoteComponent.templateLoaded) {
@@ -312,10 +306,20 @@ class FretNoteComponent extends HTMLElement {
         const noteMarker = this.shadowRoot.querySelector('.NoteMarker');
         if (!noteMarker) return;
 
-        if (FretNoteComponent.scalePeekActive && this.hasAttribute('in-scale') && !this.hasAttribute('active')) {
-            noteMarker.style.opacity = '0.4';
+        if (FretNoteComponent.scalePeekActive) {
+            noteMarker.style.pointerEvents = 'none';
+            noteMarker.style.transition = 'opacity 0.1s linear';
+            if (this.hasAttribute('active')) {
+                noteMarker.style.setProperty('opacity', '1', 'important');
+            } else if (this.hasAttribute('in-scale')) {
+                noteMarker.style.setProperty('opacity', '0.4', 'important');
+            } else {
+                noteMarker.style.setProperty('opacity', '0', 'important');
+            }
         } else {
-            noteMarker.style.opacity = '';
+            noteMarker.style.removeProperty('opacity');
+            noteMarker.style.removeProperty('transition');
+            noteMarker.style.removeProperty('pointer-events');
         }
     }
 
