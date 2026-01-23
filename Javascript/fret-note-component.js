@@ -82,7 +82,81 @@ class FretNoteComponent extends HTMLElement {
         'high-e': 'High E'
     };
 
+    static instances = new Set();
+    static scalePeekActive = false;
+    static scalePeekListenersAttached = false;
+
+    static _setScalePeekActive(active) {
+        FretNoteComponent._collectInstancesFromDom();
+        FretNoteComponent.scalePeekActive = active;
+        FretNoteComponent.instances.forEach((note) => {
+            if (active) {
+                note._updateInScaleState();
+                note.setAttribute('scale-peek', '');
+            } else {
+                note.removeAttribute('scale-peek');
+            }
+            if (note._applyScalePeekState) {
+                note._applyScalePeekState();
+            }
+        });
+    }
+
+    static _isEditableEventTarget(event) {
+        const path = event.composedPath ? event.composedPath() : [event.target];
+        return path.some((el) => {
+            if (!(el instanceof HTMLElement)) return false;
+            if (el.isContentEditable) return true;
+            const tagName = el.tagName;
+            return tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT';
+        });
+    }
+
+    static _ensureScalePeekListeners() {
+        if (FretNoteComponent.scalePeekListenersAttached) return;
+        FretNoteComponent.scalePeekListenersAttached = true;
+
+        const isPeekKey = (e) => e.code === 'KeyP' || e.key === 'p' || e.key === 'P';
+
+        window.addEventListener('keydown', (e) => {
+            if (!isPeekKey(e)) return;
+            if (e.altKey || e.ctrlKey || e.metaKey) return;
+            if (FretNoteComponent.scalePeekActive) return;
+            if (FretNoteComponent._isEditableEventTarget(e)) return;
+            FretNoteComponent._setScalePeekActive(true);
+        }, { capture: true });
+
+        window.addEventListener('keyup', (e) => {
+            if (!isPeekKey(e)) return;
+            if (!FretNoteComponent.scalePeekActive) return;
+            FretNoteComponent._setScalePeekActive(false);
+        }, { capture: true });
+
+        window.addEventListener('blur', () => {
+            if (FretNoteComponent.scalePeekActive) {
+                FretNoteComponent._setScalePeekActive(false);
+            }
+        });
+    }
+
+    static _collectInstancesFromDom() {
+        const fretboard = document.querySelector('fretboard-neck');
+        if (!fretboard || !fretboard.shadowRoot) return;
+
+        const fretDots = fretboard.shadowRoot.querySelectorAll('fret-single-dot');
+        fretDots.forEach((dot) => {
+            if (!dot.shadowRoot) return;
+            const notes = dot.shadowRoot.querySelectorAll('fret-note');
+            notes.forEach((note) => FretNoteComponent.instances.add(note));
+        });
+    }
+
     async connectedCallback() {
+        FretNoteComponent.instances.add(this);
+        if (FretNoteComponent.scalePeekActive) {
+            this.setAttribute('scale-peek', '');
+        }
+
         // Load template if not already loaded (singleton pattern)
         if (!FretNoteComponent.templateLoaded) {
             if (!FretNoteComponent.templatePromise) {
@@ -111,6 +185,8 @@ class FretNoteComponent extends HTMLElement {
         
         // Listen for scale-selector root changes
         this._setupScaleListener();
+
+        FretNoteComponent._ensureScalePeekListeners();
     }
 
     _setupClickHandler() {
@@ -118,6 +194,9 @@ class FretNoteComponent extends HTMLElement {
         if (noteMarker) {
             noteMarker.addEventListener('click', () => {
                 this.toggleAttribute('active');
+                if (FretNoteComponent.scalePeekActive) {
+                    this._applyScalePeekState();
+                }
             });
         }
     }
@@ -138,6 +217,8 @@ class FretNoteComponent extends HTMLElement {
         if (this._scaleChangeHandler) {
             document.removeEventListener('change', this._scaleChangeHandler);
         }
+
+        FretNoteComponent.instances.delete(this);
     }
 
     async _loadTemplate() {
@@ -220,6 +301,21 @@ class FretNoteComponent extends HTMLElement {
             this.setAttribute('in-scale', '');
         } else {
             this.removeAttribute('in-scale');
+        }
+
+        if (FretNoteComponent.scalePeekActive) {
+            this._applyScalePeekState();
+        }
+    }
+
+    _applyScalePeekState() {
+        const noteMarker = this.shadowRoot.querySelector('.NoteMarker');
+        if (!noteMarker) return;
+
+        if (FretNoteComponent.scalePeekActive && this.hasAttribute('in-scale') && !this.hasAttribute('active')) {
+            noteMarker.style.opacity = '0.4';
+        } else {
+            noteMarker.style.opacity = '';
         }
     }
 
