@@ -1,0 +1,97 @@
+<template id="scale-selector-template">
+    <style>
+        :host {
+            display: inline-flex;
+        }
+
+        .ScaleSelectorWrapper {
+            padding: 0px;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 15px;
+            display: inline-flex;
+        }
+
+        .ScaleRoot {
+            height: 24px;
+            padding-left: 10px;
+            padding-right: 10px;
+            background: #D6D5D1;
+            box-shadow: 1px 1px 3px rgba(98, 98, 98, 0.90);
+            border-radius: 5px;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            display: flex;
+        }
+
+        .ScaleName {
+            height: 24px;
+            padding-left: 10px;
+            padding-right: 10px;
+            background: #D6D5D1;
+            box-shadow: 1px 1px 3px rgba(98, 98, 98, 0.90);
+            border-radius: 5px;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            display: flex;
+        }
+
+        .RootText,
+        .NameText {
+            color: black;
+            font-size: 12px;
+            font-family: 'Karla', sans-serif;
+            font-weight: 400;
+            word-wrap: break-word;
+        }
+
+        .ScaleRoot,
+        .ScaleName {
+            cursor: pointer;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .ScaleRoot:hover,
+        .ScaleName:hover {
+            background: #EBEBEB;
+            box-shadow: 1px 1px 4px rgba(98, 98, 98, 0.95);
+        }
+
+        .RootText.editing,
+        .NameText.editing {
+            opacity: 0.5;
+        }
+
+        .EditInput {
+            border: none;
+            background: transparent;
+            color: black;
+            font-size: 12px;
+            font-family: 'Karla', sans-serif;
+            font-weight: 400;
+            outline: none;
+            width: auto;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .EditInput.root-input {
+            max-width: 30px;
+        }
+
+        .EditInput.name-input {
+            min-width: 80px;
+        }
+    </style>
+
+    <div class="ScaleSelectorWrapper">
+        <div class="ScaleRoot">
+            <div class="RootText" data-bind="root">A</div>
+        </div>
+        <div class="ScaleName">
+            <div class="NameText" data-bind="name">Harmonic Minor</div>
+        </div>
+    </div>
+</template>

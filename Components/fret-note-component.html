@@ -1,0 +1,82 @@
+<template id="fret-note-template">
+    <style>
+        :host {
+            display: block;
+            aspect-ratio: 1 / 1;
+        }
+
+
+        .NoteMarker {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            container-type: inline-size;
+            border-radius: 50%;
+            box-shadow: inset 1px 1px 2px rgba(91, 91, 91, 0.3), inset -1px -1px 2px rgba(65, 65, 65, 0.5);
+            filter: drop-shadow(-5px 5px 10px rgba(0, 0, 0, 0.2)) drop-shadow(5px 0px 10px rgba(0, 0, 0, 0.2));
+            opacity: 0;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        /* Hover state - partially visible */
+        .NoteMarker:hover {
+            opacity: 0.6;
+        }
+
+        /* Active/selected state - fully visible */
+        :host([active]) .NoteMarker {
+            opacity: 1;
+        }
+
+        :host([active]) .NoteMarker:hover {
+            opacity: 0.8;
+        }
+
+        .NoteMarker img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: filter 0.2s ease;
+        }
+
+        /* In-scale notes - green tint */
+        :host([in-scale]) .NoteMarker img {
+            filter: hue-rotate(85deg) saturate(0.8);
+        }
+        .NoteText{
+            position: absolute;
+            top: 55%;
+            left: 51%;
+            transform: translate(-50%, -50%);
+            font-family: 'Baloo Bhaijaan 2';
+            font-style: normal;
+            font-weight: 200;
+            font-size: 40cqw;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #ffffff;
+            transition: opacity 0.2s ease;
+        }
+
+        :host(:not([show-info])) .NoteText {
+            opacity: 0;
+        }
+
+
+    </style>
+
+    <div class="NoteMarker">
+        <img src="Assets/NoteMarker.svg" alt="Note Marker">
+        <div class="NoteText"></div>
+    </div>
+
+
+
+
+</template>
+
+<!-- <fret-note></fret-note> -->

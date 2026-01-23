@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#E0DFDC">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Document</title>
+
+</head>
+
+<script src="Javascript/fret-single-dot-component.js"></script>
+<script src="Javascript/fretboard-neck-component.js"></script>
+<script src="Javascript/fret-note-component.js"></script>
+<script src="Javascript/toggle-component.js"></script>
+<script src="Javascript/scale-selector-component.js"></script>
+<script src="Javascript/text-editor-component.js"></script>
+
+<style>
+    * {
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    html,
+    body {
+        margin: 0;
+        height: 100%;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background-color: #E0DFDC;
+    }
+
+    .FretboardSection {
+        display: flex;
+        flex: 1 1 auto;
+        min-height: 20%;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        overflow: visible;
+    }
+
+    .MiddleSection {
+        display: flex;
+        flex: 1 1 33.33%;
+        min-height: 0;
+    }
+
+    .BottomSection {
+        display: flex;
+        flex: 1 1 50%;
+        min-height: 0;
+        justify-content: center;
+    }
+
+
+    .Fretboard {
+        /* Default size when no saved size exists */
+        width: min(calc(25vh * (16 / 2.8)), 85vw, 85rem);
+        aspect-ratio: 16 / 2.8;
+        height: auto;
+
+        /* Constraints to shrink when window is too small */
+        max-width: calc(100vw - 40px);
+        max-height: calc(100vh / 3 - 40px);
+    }
+
+    .ControlBar {
+        display: flex;
+        width: 100%;
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 40px;
+    }
+
+    .ControlBar>div[data-layer="toggle-area"] {
+        display: flex;
+        gap: 40px;
+    }
+
+    .ScaleSelectorWrapper {
+        height: 100%;
+    }
+</style>
+
+<body>
+    <div data-layer="Control Bar" class="ControlBar">
+        <div data-layer="toggle-area">
+            <toggle-component id="show-info-toggle" label="Info" height="25" persist-key="toggle-show-info" target="fret-notes" controls-visibility="note-names-toggle"></toggle-component>
+            <toggle-component id="note-names-toggle" height="25" modes="Note Names, Degree" persist-key="toggle-display-mode" target="fret-notes-display"></toggle-component>
+        </div>
+        <div data-layer="Scale ScaleSelectorWrapper" class="ScaleSelectorWrapper">
+            <scale-selector root="A" name="Harmonic Minor"></scale-selector>
+        </div>
+
+
+    </div>
+    <div data-layer="Top Section" class="FretboardSection">
+        <fretboard-neck class="Fretboard" frets="15"></fretboard-neck>
+    </div>
+    <div data-layer="Middle Section" class="MiddleSection"></div>
+    <div data-layer="Bottom Section" class="BottomSection">
+        <text-editor></text-editor>
+        
+    </div>
+</body>
+
+</html>

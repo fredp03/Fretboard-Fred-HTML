@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Document</title>
+</head>
+
+<style>
+
+    .Page{
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        gap: 30px;
+    }
+
+
+</style>
+
+<!-- 
+------------ LOAD COMPONENT HERE ------------>
+
+<script src="Javascript/fret-single-dot-component.js"></script>
+<script src="Javascript/fretboard-neck-component.js"></script>
+<script src="Javascript/fret-note-component.js"></script>
+<script src="Javascript/toggle-component.js"></script>
+<script src="Javascript/text-editor-component.js"></script>
+
+
+<body style="margin: 0;">
+
+<!-- Main LightingCards Wrapper -->
+<style> * {box-sizing: border-box;}</style>
+
+
+<div data-layer="Page" class="Page">
+
+<text-editor></text-editor>
+
+</div>
+
+</body>
+</html>

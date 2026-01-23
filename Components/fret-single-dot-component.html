@@ -1,0 +1,221 @@
+<template id="fret-single-dot-template">
+    <style>
+        :host {
+            display: inline-block;
+            height: 100%;
+        }
+
+        /* Hide dots when dot="none" */
+        :host([dot="none"]) .FretDot {
+            display: none;
+        }
+
+        /* Single dot mode (default) - hide bottom dot */
+        :host([dot="single"]) .FretDot.FretDotBottom {
+            display: none;
+        }
+
+        /* Double dot mode - show both, use column layout */
+        :host([dot="double"]) .FretDotContainer {
+            flex-direction: column;
+        }
+
+        :host([dot="double"]) .FretDotHalf {
+            display: flex;
+        }
+
+        /* Single dot mode - hide the half containers, show single centered dot */
+        :host([dot="single"]) .FretDotHalf {
+            display: none;
+        }
+
+        :host([dot="single"]) .FretDot.FretDotSingle {
+            display: block;
+        }
+
+        :host([dot="double"]) .FretDot.FretDotSingle {
+            display: none;
+        }
+
+        .FretSingleDotWrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .FretComponent {
+            width: 100%;
+            height: 100%;
+            outline: 1px rgba(0, 0, 0, 0.08) solid;
+            outline-offset: -1px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            position: relative;
+        }
+
+        .FretComponentStrings {
+            grid-row: 1;
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .FretComponentStrings .StringContainer {
+            height: 14%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .FretComponentStrings .String {
+            --base-string-height: 7px;
+            width: 100%;
+            background: linear-gradient(0deg, rgba(163, 117, 82, 0.2), rgba(163, 117, 82, 0.2)), linear-gradient(0deg, #000000 0%, #4C4C4C 25.48%, #747474 44.71%, #878787 65.38%, #727272 78.85%, #575757 94.71%, #333333 100%);
+        }
+
+        /* String thicknesses based on percentage of Low E */
+        .FretComponentStrings .String.low-e  { height: calc(var(--base-string-height) * 1.0); }
+        .FretComponentStrings .String.a      { height: calc(var(--base-string-height) * 0.7826); }
+        .FretComponentStrings .String.d      { height: calc(var(--base-string-height) * 0.5652); }
+        .FretComponentStrings .String.g      { height: calc(var(--base-string-height) * 0.4696); }
+        .FretComponentStrings .String.b      { height: calc(var(--base-string-height) * 0.4226); }
+        .FretComponentStrings .String.high-e { height: calc(var(--base-string-height) * 0.3974); }
+
+        .FretDotWrapper {
+            grid-row: 1;
+            grid-column: 1;
+            display: grid;
+            height: 100%;
+        }
+
+        .FretDotContainer {
+            grid-row: 1;
+            grid-column: 1;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            overflow: hidden;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .NotePlaceholderWrapper {
+            grid-row: 1;
+            grid-column: 1;
+            display: flex;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+
+        .NotePlaceholderContainer {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+
+        .FretDotHalf {
+            flex: 1;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .FretMarker {
+            grid-row: 1;
+            grid-column: 2;
+            height: 100%;
+            display: flex;
+            position: relative;
+            z-index: 1;
+        }
+
+        .FretMarker img {
+            height: 100%;
+            width: 2px;
+        }
+        .FretDot {
+            height: 12%;
+            aspect-ratio: 2 / 1;
+        }
+
+        .FretDotHalf .FretDot {
+            height: 24%;
+        }
+
+        .FretDot object {
+            display: block;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .NotePlaceholder{
+            aspect-ratio: 1 / 1;
+            height: 14%;
+            flex-shrink: 0;
+        }
+    </style>
+
+    <div class="FretSingleDotWrapper">
+        <div class="FretComponent">
+            <div class="FretDotWrapper">
+                <div class="FretDotContainer">
+                    <!-- Single centered dot (for dot="single") -->
+                    <div class="FretDot FretDotSingle">
+                        <object type="image/svg+xml" data="Assets/fret-dot.svg"></object>
+                    </div>
+                    <!-- Top half with dot (for dot="double") -->
+                    <div class="FretDotHalf FretDotHalfTop">
+                        <div class="FretDot FretDotTop">
+                            <object type="image/svg+xml" data="Assets/fret-dot.svg"></object>
+                        </div>
+                    </div>
+                    <!-- Bottom half with dot (for dot="double") -->
+                    <div class="FretDotHalf FretDotHalfBottom">
+                        <div class="FretDot FretDotBottom">
+                            <object type="image/svg+xml" data="Assets/fret-dot.svg"></object>
+                        </div>
+                    </div>
+                </div>
+                <!-- Note container overlay -->
+                <div class="NotePlaceholderWrapper">
+                    <div class="NotePlaceholderContainer">
+                        <fret-note class="NotePlaceholder" string-name="high-e"></fret-note>
+                        <fret-note class="NotePlaceholder" string-name="b"></fret-note>
+                        <fret-note class="NotePlaceholder" string-name="g"></fret-note>
+                        <fret-note class="NotePlaceholder" string-name="d"></fret-note>
+                        <fret-note class="NotePlaceholder" string-name="a"></fret-note>
+                        <fret-note class="NotePlaceholder" string-name="low-e"></fret-note>
+
+                    </div>
+                </div>
+            </div>
+            <div class="FretMarker">
+                <img src="Assets/fret-marker.svg" alt="">
+            </div>
+            <div class="FretComponentStrings">
+                <div class="StringContainer"><div class="String high-e"></div></div>
+                <div class="StringContainer"><div class="String b"></div></div>
+                <div class="StringContainer"><div class="String g"></div></div>
+                <div class="StringContainer"><div class="String d"></div></div>
+                <div class="StringContainer"><div class="String a"></div></div>
+                <div class="StringContainer"><div class="String low-e"></div></div>
+            </div>
+        </div>
+    </div>
+</template>

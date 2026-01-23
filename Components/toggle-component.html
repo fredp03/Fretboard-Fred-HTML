@@ -1,0 +1,130 @@
+<template id="toggle-template">
+    <style>
+        :host {
+            display: inline-flex;
+        }
+
+        .ToggleWrapper {
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 9px;
+            display: inline-flex;
+        }
+
+        .Slider {
+            position: relative;
+            height: var(--toggle-height, 25px);
+            aspect-ratio: 49 / 25;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .Slider.checked {
+            opacity: 1;
+        }
+
+        .Slider svg {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .SliderKnob {
+            transition: transform 0.2s ease;
+        }
+
+        .SliderKnob.checked {
+            transform: translateX(22px);
+        }
+
+        .Label {
+            color: var(--Card-Background-Color, #716F6F);
+            font-size: 12px;
+            font-family: Karla, sans-serif;
+            font-weight: 400;
+            word-wrap: break-word;
+        }
+    </style>
+
+    <div class="ToggleWrapper">
+        <div class="Slider">
+            <svg viewBox="0 0 49 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g filter="url(#filter0_ddiiii_91_831)">
+                    <rect x="3" y="3" width="43" height="19" rx="9.5" fill="#575757"/>
+                </g>
+                <g class="SliderKnob" filter="url(#filter1_dddd_91_831)">
+                    <circle cx="13.5" cy="12.5" r="8.5" fill="#e0dfdc"/>
+                    <circle cx="13.5" cy="12.5" r="7.5" stroke="#8E8E8E" stroke-width="2"/>
+                </g>
+                <defs>
+                    <filter id="filter0_ddiiii_91_831" x="0" y="0" width="49" height="25" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                        <feOffset dx="-1" dy="-1"/>
+                        <feGaussianBlur stdDeviation="1"/>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0.231373 0 0 0 0 0.231373 0 0 0 0 0.231373 0 0 0 0.5 0"/>
+                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_91_831"/>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                        <feOffset dx="1" dy="1"/>
+                        <feGaussianBlur stdDeviation="1"/>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0.45098 0 0 0 0 0.45098 0 0 0 0 0.45098 0 0 0 0.3 0"/>
+                        <feBlend mode="normal" in2="effect1_dropShadow_91_831" result="effect2_dropShadow_91_831"/>
+                        <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_91_831" result="shape"/>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                        <feOffset dx="1" dy="1"/>
+                        <feGaussianBlur stdDeviation="1.5"/>
+                        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0.231373 0 0 0 0 0.231373 0 0 0 0 0.231373 0 0 0 0.9 0"/>
+                        <feBlend mode="normal" in2="shape" result="effect3_innerShadow_91_831"/>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                        <feOffset dx="-1" dy="-1"/>
+                        <feGaussianBlur stdDeviation="1"/>
+                        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0.45098 0 0 0 0 0.45098 0 0 0 0 0.45098 0 0 0 0.9 0"/>
+                        <feBlend mode="normal" in2="effect3_innerShadow_91_831" result="effect4_innerShadow_91_831"/>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                        <feOffset dx="1" dy="-1"/>
+                        <feGaussianBlur stdDeviation="1"/>
+                        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0.231373 0 0 0 0 0.231373 0 0 0 0 0.231373 0 0 0 0.2 0"/>
+                        <feBlend mode="normal" in2="effect4_innerShadow_91_831" result="effect5_innerShadow_91_831"/>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                        <feOffset dx="-1" dy="1"/>
+                        <feGaussianBlur stdDeviation="1"/>
+                        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0.231373 0 0 0 0 0.231373 0 0 0 0 0.231373 0 0 0 0.2 0"/>
+                        <feBlend mode="normal" in2="effect5_innerShadow_91_831" result="effect6_innerShadow_91_831"/>
+                    </filter>
+                    <filter id="filter1_dddd_91_831" x="0" y="1" width="49" height="24" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                        <feOffset dx="0" dy="0"/>
+                        <feGaussianBlur stdDeviation="0.5"/>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.85 0"/>
+                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_91_831"/>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                        <feOffset dx="0" dy="1"/>
+                        <feGaussianBlur stdDeviation="0.5"/>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0"/>
+                        <feBlend mode="normal" in2="effect1_dropShadow_91_831" result="effect2_dropShadow_91_831"/>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                        <feOffset dx="0" dy="2"/>
+                        <feGaussianBlur stdDeviation="0.5"/>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/>
+                        <feBlend mode="normal" in2="effect2_dropShadow_91_831" result="effect3_dropShadow_91_831"/>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                        <feOffset dx="0" dy="3"/>
+                        <feGaussianBlur stdDeviation="0.5"/>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.02 0"/>
+                        <feBlend mode="normal" in2="effect3_dropShadow_91_831" result="effect4_dropShadow_91_831"/>
+                        <feBlend mode="normal" in="SourceGraphic" in2="effect4_dropShadow_91_831" result="shape"/>
+                    </filter>
+                </defs>
+            </svg>
+        </div>
+        <div class="Label" data-bind="label">Label</div>
+    </div>
+</template>
+
+<!-- <toggle-component></toggle-component> -->
