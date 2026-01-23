@@ -134,12 +134,19 @@ class TextEditorComponent extends HTMLElement {
                     return;
                 }
 
+                const selectedContents = range.extractContents();
+                const span = document.createElement('span');
+                span.style.fontWeight = '700';
+                span.appendChild(selectedContents);
+                range.insertNode(span);
+
                 if (selection) {
                     selection.removeAllRanges();
-                    selection.addRange(range);
+                    const spanRange = document.createRange();
+                    spanRange.selectNodeContents(span);
+                    selection.addRange(spanRange);
                 }
 
-                document.execCommand('bold', false, null);
                 this._savedSelection = null;
             });
         }
