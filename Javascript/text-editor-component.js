@@ -56,38 +56,11 @@ class TextEditorComponent extends HTMLElement {
 
     _setupEventHandlers() {
         const textBody = this.shadowRoot.querySelector('.textbody');
-        const boldBtn = this.shadowRoot.querySelector('.bold-btn');
-        const underlineBtn = this.shadowRoot.querySelector('.underline-btn');
+        const boldButton = this.shadowRoot.querySelector('#bold-btn');
         
-        // Store saved selection for formatting
+        // Store reference to textBody for use in button handlers
+        this._textBody = textBody;
         this._savedSelection = null;
-        
-        // Save selection when text is selected
-        if (textBody) {
-            textBody.addEventListener('mouseup', () => {
-                this._saveSelection();
-            });
-            
-            textBody.addEventListener('keyup', () => {
-                this._saveSelection();
-            });
-        }
-        
-        // Bold button - use mousedown to prevent losing selection
-        if (boldBtn) {
-            boldBtn.addEventListener('mousedown', (e) => {
-                e.preventDefault(); // Prevents blur/focus change
-                this._applyFormatting('bold');
-            });
-        }
-        
-        // Underline button - use mousedown to prevent losing selection
-        if (underlineBtn) {
-            underlineBtn.addEventListener('mousedown', (e) => {
-                e.preventDefault(); // Prevents blur/focus change
-                this._applyFormatting('underline');
-            });
-        }
         
         if (textBody) {
             // Enable editing on double click
@@ -107,6 +80,22 @@ class TextEditorComponent extends HTMLElement {
                 }, 0);
             });
             
+            // Save selection whenever mouse is released in textbody
+            textBody.addEventListener('mouseup', () => {
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+                    this._savedSelection = selection.getRangeAt(0).cloneRange();
+                }
+            });
+            
+            // Also save on keyup (for shift+arrow selections)
+            textBody.addEventListener('keyup', () => {
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+                    this._savedSelection = selection.getRangeAt(0).cloneRange();
+                }
+            });
+            
             // Handle Shift + Enter key for line breaks
             textBody.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && e.shiftKey) {
@@ -115,82 +104,43 @@ class TextEditorComponent extends HTMLElement {
                 }
             });
             
-            // Disable editing when clicking outside (but not on toolbar buttons)
-            textBody.addEventListener('blur', (e) => {
-                // Delay to check if focus moved to a toolbar button
-                setTimeout(() => {
-                    const activeElement = this.shadowRoot.activeElement;
-                    if (!activeElement || !activeElement.closest('.text-editor-control')) {
-                        textBody.setAttribute('contenteditable', 'false');
-                    }
-                }, 100);
+            // Disable editing when clicking outside
+            textBody.addEventListener('blur', () => {
+                textBody.setAttribute('contenteditable', 'false');
             });
         }
-    }
-    
-    _saveSelection() {
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-            this._savedSelection = selection.getRangeAt(0).cloneRange();
-        }
-    }
 
-    _applyFormatting(command) {
-        const textBody = this.shadowRoot.querySelector('.textbody');
-        const selection = window.getSelection();
-        
-        // Make sure the textbody is editable
-        textBody.setAttribute('contenteditable', 'true');
-        textBody.focus();
-        
-        // Use saved selection or current selection
-        let range;
-        if (this._savedSelection) {
-            range = this._savedSelection;
-            selection.removeAllRanges();
-            selection.addRange(range);
-        } else if (selection.rangeCount > 0) {
-            range = selection.getRangeAt(0);
-        } else {
-            return;
+        // Bold button functionality
+        if (boldButton) {
+            boldButton.style.cursor = 'pointer';
+            
+            boldButton.addEventListener('mousedown', (e) => {
+                e.preventDefault(); // Prevent button from stealing focus
+                e.stopPropagation();
+                
+                if (this._savedSelection && this._textBody.contains(this._savedSelection.commonAncestorContainer)) {
+                    const range = this._savedSelection;
+                    const selectedContents = range.extractContents();
+                    const span = document.createElement('span');
+                    span.style.fontWeight = '700';
+                    span.appendChild(selectedContents);
+                    range.insertNode(span);
+                    
+                    // Clear saved selection
+                    this._savedSelection = null;
+                    window.getSelection().removeAllRanges();
+                } else {
+                    // No selection - toggle bold on entire textbody
+                    if (this._textBody) {
+                        if (this._textBody.style.fontWeight === '700') {
+                            this._textBody.style.fontWeight = '400';
+                        } else {
+                            this._textBody.style.fontWeight = '700';
+                        }
+                    }
+                }
+            });
         }
-        
-        // Check if there's actually selected text
-        if (range.collapsed) {
-            return;
-        }
-        
-        // Get the selected text
-        const selectedText = range.toString();
-        if (!selectedText) {
-            return;
-        }
-        
-        // Create the wrapper element based on command
-        let wrapper;
-        if (command === 'bold') {
-            wrapper = document.createElement('strong');
-        } else if (command === 'underline') {
-            wrapper = document.createElement('u');
-        } else {
-            return;
-        }
-        
-        // Extract the selected content and wrap it
-        const fragment = range.extractContents();
-        wrapper.appendChild(fragment);
-        
-        // Insert the wrapped content
-        range.insertNode(wrapper);
-        
-        // Clear the saved selection
-        this._savedSelection = null;
-        
-        // Update selection to be after the inserted content
-        selection.removeAllRanges();
-        const newRange = document.createRange();
-        newRange.selectNodeContents(wrapper);
-        selection.addRange(newRange);
     }
 
     attributeChangedCallback(name, oldValue, newValue) {

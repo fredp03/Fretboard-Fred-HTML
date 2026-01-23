@@ -15,23 +15,7 @@
         }
 
         :root {
-            --website-background: rgba(69, 69, 69, 1);
-            --wallpaper: rgba(69, 69, 69, 1);
-            --text-editor-body-font-family: "Aktiv Grotesk Corp", Helvetica;
-            --text-editor-body-font-weight: 300;
-            --text-editor-body-font-size: 15px;
-            --text-editor-body-letter-spacing: 0px;
-            --text-editor-body-line-height: 200%;
-            --text-editor-body-font-style: normal;
-            --note-marker-font-family: "Baloo Bhaijaan 2", Helvetica;
-            --note-marker-font-weight: 400;
-            --note-marker-font-size: 11px;
-            --note-marker-letter-spacing: 0px;
-            --note-marker-line-height: 100%;
-            --note-marker-font-style: normal;
-            --hover-selected: 0px 1px 3px 0px rgba(0, 0, 0, 0.25);
-            --hover-true-selected-false: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);
-            --hover-false-selected-true: 0px 4px 8.100000381469727px 0px rgba(0, 0, 0, 0.25);
+
         }
 
         .text-section {
@@ -84,15 +68,6 @@
             font-size: 12px;
         }
 
-        .text-section .textbody strong,
-        .text-section .textbody b {
-            font-weight: 700;
-        }
-
-        .text-section .textbody u {
-            text-decoration: underline;
-        }
-
         .text-section:has([contenteditable="true"]) {
             box-shadow: 1px 1px 2.5px rgba(129.03, 129.03, 129.03, 0.90);
             overflow: visible;
@@ -139,11 +114,6 @@
             position: relative;
             align-self: stretch;
             flex: 0 0 auto;
-            cursor: pointer;
-        }
-
-        .text-editor-control .img:hover {
-            opacity: 0.7;
         }
 
         .title-section {
@@ -206,8 +176,8 @@
             <div class="text-editor-control" data-text-fonts-mode="text-editor-body">
                 <div class="div">
                     <div class="spacer"></div>
-                    <div class="spacer"></div><img class="img underline-btn" src="Assets/Underline Icon.svg">
-                    <div class="spacer"></div><img class="img bold-btn" src="Assets/Bold Icon.svg">
+                    <div class="spacer"></div><img class="img" id="underline-btn" src="Assets/Underline Icon.svg">
+                    <div class="spacer"></div><img class="img" id="bold-btn" src="Assets/Bold Icon.svg">
                     <div class="spacer"></div>
                     <div class="spacer"></div>
                 </div>
@@ -239,9 +209,9 @@
         </div>
 
 
-        <div class="text-section" data-text-fonts-mode="text-editor-body">
-            <div class="text-area" data-text-fonts-mode="text-editor-title">
-                <p class="textbody" data-text-fonts-mode="text-editor-body">Start Typing your text in here...</p>
+        <div class="text-section">
+            <div class="text-area">
+                <p class="textbody" >Start Typing your text in here...</p>
             </div>
         </div>
     </div>
