@@ -117,28 +117,37 @@ class TextEditorComponent extends HTMLElement {
             boldButton.addEventListener('mousedown', (e) => {
                 e.preventDefault(); // Prevent button from stealing focus
                 e.stopPropagation();
-                
-                if (this._savedSelection && this._textBody.contains(this._savedSelection.commonAncestorContainer)) {
-                    const range = this._savedSelection;
-                    const selectedContents = range.extractContents();
-                    const span = document.createElement('span');
-                    span.style.fontWeight = '700';
-                    span.appendChild(selectedContents);
-                    range.insertNode(span);
-                    
-                    // Clear saved selection
-                    this._savedSelection = null;
-                    window.getSelection().removeAllRanges();
-                } else {
-                    // No selection - toggle bold on entire textbody
-                    if (this._textBody) {
-                        if (this._textBody.style.fontWeight === '700') {
-                            this._textBody.style.fontWeight = '400';
-                        } else {
-                            this._textBody.style.fontWeight = '700';
-                        }
+
+                const selection = window.getSelection();
+                let range = null;
+
+                if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+                    const candidateRange = selection.getRangeAt(0);
+                    if (this._textBody && this._textBody.contains(candidateRange.commonAncestorContainer)) {
+                        range = candidateRange.cloneRange();
                     }
+                } else if (this._savedSelection && this._textBody.contains(this._savedSelection.commonAncestorContainer)) {
+                    range = this._savedSelection.cloneRange();
                 }
+
+                if (!range || range.collapsed) {
+                    return;
+                }
+
+                const selectedContents = range.extractContents();
+                const span = document.createElement('span');
+                span.style.fontWeight = '700';
+                span.appendChild(selectedContents);
+                range.insertNode(span);
+
+                if (selection) {
+                    selection.removeAllRanges();
+                    const spanRange = document.createRange();
+                    spanRange.selectNodeContents(span);
+                    selection.addRange(spanRange);
+                }
+
+                this._savedSelection = null;
             });
         }
     }
