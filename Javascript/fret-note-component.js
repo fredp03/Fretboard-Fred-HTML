@@ -42,35 +42,42 @@ class FretNoteComponent extends HTMLElement {
     // Scales that use #4 instead of b5
     static sharpFourScales = ['Lydian', 'Lydian Augmented', 'Lydian Dominant'];
 
-    // Scale formulas as semitone intervals from root
-    static scaleFormulas = {
-        // Major modes
-        'Major': [0, 2, 4, 5, 7, 9, 11],
-        'Dorian': [0, 2, 3, 5, 7, 9, 10],
-        'Phrygian': [0, 1, 3, 5, 7, 8, 10],
-        'Lydian': [0, 2, 4, 6, 7, 9, 11],
-        'Mixolydian': [0, 2, 4, 5, 7, 9, 10],
-        'Natural Minor': [0, 2, 3, 5, 7, 8, 10],
-        'Locrian': [0, 1, 3, 5, 6, 8, 10],
-        // Harmonic Minor
-        'Harmonic Minor': [0, 2, 3, 5, 7, 8, 11],
-        // Melodic Minor modes
-        'Melodic Minor': [0, 2, 3, 5, 7, 9, 11],
-        'Dorian b2': [0, 1, 3, 5, 7, 9, 10],
-        'Lydian Augmented': [0, 2, 4, 6, 8, 9, 11],
-        'Lydian Dominant': [0, 2, 4, 6, 7, 9, 10],
-        'Mixolydian b6': [0, 2, 4, 5, 7, 8, 10],
-        'Locrian #2': [0, 2, 3, 5, 6, 8, 10],
-        'Super Locrian': [0, 1, 3, 4, 6, 8, 10],
-        'Altered': [0, 1, 3, 4, 6, 8, 10],
-        // Other scales
-        'Pentatonic Major': [0, 2, 4, 7, 9],
-        'Pentatonic Minor': [0, 3, 5, 7, 10],
-        'Blues': [0, 3, 5, 6, 7, 10],
-        'Whole Tone': [0, 2, 4, 6, 8, 10],
-        'Diminished': [0, 2, 3, 5, 6, 8, 9, 11],
-        'Chromatic': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    };
+        // Scale formulas as semitone intervals from root
+        static scaleFormulas = {
+            // Major modes
+            'Major': [0, 2, 4, 5, 7, 9, 11],
+            'Dorian': [0, 2, 3, 5, 7, 9, 10],
+            'Phrygian': [0, 1, 3, 5, 7, 8, 10],
+            'Lydian': [0, 2, 4, 6, 7, 9, 11],
+            'Mixolydian': [0, 2, 4, 5, 7, 9, 10],
+            'Natural Minor': [0, 2, 3, 5, 7, 8, 10],
+            'Locrian': [0, 1, 3, 5, 6, 8, 10],
+            // Harmonic Minor modes
+            'Harmonic Minor': [0, 2, 3, 5, 7, 8, 11],
+            'Locrian #6': [0, 1, 3, 5, 6, 9, 10],
+            'Ionian Augmented': [0, 2, 4, 5, 8, 9, 11],
+            'Dorian #4': [0, 2, 3, 6, 7, 9, 10],
+            'Phrygian Dominant': [0, 1, 4, 5, 7, 8, 10],
+            'Lydian #2': [0, 3, 4, 6, 7, 9, 11],
+            'Super Locrian bb7': [0, 1, 3, 4, 6, 8, 9],
+            // Melodic Minor modes
+            'Melodic Minor': [0, 2, 3, 5, 7, 9, 11],
+            'Dorian b2': [0, 1, 3, 5, 7, 9, 10],
+            'Lydian Augmented': [0, 2, 4, 6, 8, 9, 11],
+            'Lydian Dominant': [0, 2, 4, 6, 7, 9, 10],
+            'Mixolydian b6': [0, 2, 4, 5, 7, 8, 10],
+            'Locrian #2': [0, 2, 3, 5, 6, 8, 10],
+            'Super Locrian': [0, 1, 3, 4, 6, 8, 10],
+            'Altered': [0, 1, 3, 4, 6, 8, 10],
+            // Other scales
+            'Pentatonic Major': [0, 2, 4, 7, 9],
+            'Pentatonic Minor': [0, 3, 5, 7, 10],
+            'Blues': [0, 3, 5, 6, 7, 10],
+            'Whole Tone': [0, 2, 4, 6, 8, 10],
+            'Diminished': [0, 2, 3, 5, 6, 8, 9, 11],
+            'Chromatic': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        };
+
 
     // Map string-name attribute values to JSON string names
     static stringNameMap = {

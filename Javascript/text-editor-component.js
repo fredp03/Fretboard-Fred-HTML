@@ -59,6 +59,9 @@ class TextEditorComponent extends HTMLElement {
         const boldBtn = this.shadowRoot.querySelector('.bold-btn');
         const underlineBtn = this.shadowRoot.querySelector('.underline-btn');
         
+        // Setup resize handle
+        this._setupResizeHandle();
+        
         // Store saved selection for formatting
         this._savedSelection = null;
         
@@ -191,6 +194,90 @@ class TextEditorComponent extends HTMLElement {
         const newRange = document.createRange();
         newRange.selectNodeContents(wrapper);
         selection.addRange(newRange);
+    }
+
+    _setupResizeHandle() {
+        const resizeHandle = this.shadowRoot.querySelector('.resize-handle');
+        const hostElement = this;
+        
+        if (!resizeHandle) return;
+        
+        let isResizing = false;
+        let startY = 0;
+        let startHeight = 0;
+        let targetHeight = 0;
+        let currentHeight = 0;
+        let lastTime = 0;
+        const FRAME_TIME = 1000 / 60; // 16.67ms for 60fps
+        const LERP_FACTOR = 0.55; // Smoothing factor
+        
+        const animate = (timestamp) => {
+            if (!isResizing) return;
+            
+            // Ensure minimum frame time for consistent 60fps
+            if (timestamp - lastTime >= FRAME_TIME) {
+                // Lerp towards target for ultra-smooth motion
+                currentHeight += (targetHeight - currentHeight) * LERP_FACTOR;
+                
+                // Snap if very close to avoid endless tiny updates
+                if (Math.abs(targetHeight - currentHeight) < 0.5) {
+                    currentHeight = targetHeight;
+                }
+                
+                hostElement.style.height = currentHeight + 'px';
+                lastTime = timestamp;
+            }
+            
+            requestAnimationFrame(animate);
+        };
+        
+        const onPointerDown = (e) => {
+            isResizing = true;
+            startY = e.clientY;
+            startHeight = hostElement.offsetHeight;
+            targetHeight = startHeight;
+            currentHeight = startHeight;
+            lastTime = performance.now();
+            
+            hostElement.classList.add('resizing');
+            resizeHandle.classList.add('dragging');
+            resizeHandle.setPointerCapture(e.pointerId);
+            
+            document.body.style.cursor = 'ns-resize';
+            
+            requestAnimationFrame(animate);
+            e.preventDefault();
+        };
+        
+        const onPointerMove = (e) => {
+            if (!isResizing) return;
+            
+            const deltaY = startY - e.clientY;
+            targetHeight = Math.max(150, startHeight + deltaY);
+        };
+        
+        const onPointerUp = (e) => {
+            if (!isResizing) return;
+            
+            isResizing = false;
+            
+            // Final snap to target
+            hostElement.style.height = targetHeight + 'px';
+            
+            hostElement.classList.remove('resizing');
+            resizeHandle.classList.remove('dragging');
+            resizeHandle.releasePointerCapture(e.pointerId);
+            
+            document.body.style.cursor = '';
+        };
+        
+        resizeHandle.addEventListener('pointerdown', onPointerDown);
+        resizeHandle.addEventListener('pointermove', onPointerMove);
+        resizeHandle.addEventListener('pointerup', onPointerUp);
+        resizeHandle.addEventListener('pointercancel', onPointerUp);
+        
+        // Prevent touch scrolling on the handle
+        resizeHandle.style.touchAction = 'none';
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
