@@ -139,18 +139,26 @@ class TextEditorComponent extends HTMLElement {
         }
     }
     
+    _getSelection() {
+        if (this.shadowRoot && typeof this.shadowRoot.getSelection === 'function') {
+            const shadowSelection = this.shadowRoot.getSelection();
+            if (shadowSelection) {
+                return shadowSelection;
+            }
+        }
+        return window.getSelection();
+    }
+
     _saveSelection() {
-        const selection = window.getSelection();
+        const selection = this._getSelection();
         const textBody = this.shadowRoot.querySelector('.textbody');
 
         if (!selection || selection.rangeCount === 0 || !textBody) {
-            this._savedSelection = null;
             return;
         }
 
         const activeRange = selection.getRangeAt(0);
         if (activeRange.collapsed || !this._isRangeInsideTextBody(activeRange, textBody)) {
-            this._savedSelection = null;
             return;
         }
 
@@ -159,42 +167,57 @@ class TextEditorComponent extends HTMLElement {
 
     _applyFormatting(command) {
         const textBody = this.shadowRoot.querySelector('.textbody');
-        const selection = window.getSelection();
-        if (!textBody || !selection) return;
-        
-        // Make sure the textbody is editable
-        textBody.setAttribute('contenteditable', 'true');
-        textBody.focus();
-        
-        // Always prefer current live selection if it's inside the editor.
+        if (!textBody) return;
+
+        const tagName = command === 'bold' ? 'b' : command === 'underline' ? 'u' : null;
+        if (!tagName) {
+            return;
+        }
+
+        const currentSelection = this._getSelection();
         let range = null;
-        if (selection.rangeCount > 0) {
-            const currentRange = selection.getRangeAt(0);
+        if (currentSelection && currentSelection.rangeCount > 0) {
+            const currentRange = currentSelection.getRangeAt(0);
             if (!currentRange.collapsed && this._isRangeInsideTextBody(currentRange, textBody)) {
                 range = currentRange.cloneRange();
             }
         }
 
-        // Fallback to a previously saved in-editor selection.
+        // Fallback to last valid in-editor selection for toolbar clicks.
         if (!range && this._savedSelection && !this._savedSelection.collapsed && this._isRangeInsideTextBody(this._savedSelection, textBody)) {
             range = this._savedSelection.cloneRange();
         }
 
-        if (!range) {
+        if (!range || !range.toString()) {
             return;
         }
 
-        const commandName = command === 'bold' ? 'bold' : command === 'underline' ? 'underline' : null;
-        if (!commandName) {
+        // Ensure editable/focused, then re-apply the exact selection range.
+        textBody.setAttribute('contenteditable', 'true');
+        textBody.focus();
+
+        const selection = this._getSelection();
+        if (!selection) {
             return;
         }
-
-        // Apply formatting only to the selected range.
         selection.removeAllRanges();
         selection.addRange(range);
-        document.execCommand('styleWithCSS', false, false);
-        document.execCommand(commandName, false, null);
-        this._saveSelection();
+
+        // Wrap only the selected fragment with the requested inline tag.
+        const wrapper = document.createElement(tagName);
+        try {
+            range.surroundContents(wrapper);
+        } catch (error) {
+            const fragment = range.extractContents();
+            wrapper.appendChild(fragment);
+            range.insertNode(wrapper);
+        }
+
+        const formattedRange = document.createRange();
+        formattedRange.selectNodeContents(wrapper);
+        selection.removeAllRanges();
+        selection.addRange(formattedRange);
+        this._savedSelection = formattedRange.cloneRange();
     }
 
     _isRangeInsideTextBody(range, textBody) {
