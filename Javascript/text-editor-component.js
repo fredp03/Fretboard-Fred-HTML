@@ -64,6 +64,7 @@ class TextEditorComponent extends HTMLElement {
         
         // Store saved selection for formatting
         this._savedSelection = null;
+        this._selectionChangeHandler = null;
         
         // Save selection when text is selected
         if (textBody) {
@@ -74,6 +75,13 @@ class TextEditorComponent extends HTMLElement {
             textBody.addEventListener('keyup', () => {
                 this._saveSelection();
             });
+
+            textBody.addEventListener('touchend', () => {
+                this._saveSelection();
+            });
+
+            this._selectionChangeHandler = () => this._saveSelection();
+            document.addEventListener('selectionchange', this._selectionChangeHandler);
         }
         
         // Bold button - use mousedown to prevent losing selection
@@ -133,67 +141,72 @@ class TextEditorComponent extends HTMLElement {
     
     _saveSelection() {
         const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-            this._savedSelection = selection.getRangeAt(0).cloneRange();
+        const textBody = this.shadowRoot.querySelector('.textbody');
+
+        if (!selection || selection.rangeCount === 0 || !textBody) {
+            this._savedSelection = null;
+            return;
         }
+
+        const activeRange = selection.getRangeAt(0);
+        if (activeRange.collapsed || !this._isRangeInsideTextBody(activeRange, textBody)) {
+            this._savedSelection = null;
+            return;
+        }
+
+        this._savedSelection = activeRange.cloneRange();
     }
 
     _applyFormatting(command) {
         const textBody = this.shadowRoot.querySelector('.textbody');
         const selection = window.getSelection();
+        if (!textBody || !selection) return;
         
         // Make sure the textbody is editable
         textBody.setAttribute('contenteditable', 'true');
         textBody.focus();
         
-        // Use saved selection or current selection
-        let range;
-        if (this._savedSelection) {
-            range = this._savedSelection;
-            selection.removeAllRanges();
-            selection.addRange(range);
-        } else if (selection.rangeCount > 0) {
-            range = selection.getRangeAt(0);
-        } else {
+        // Always prefer current live selection if it's inside the editor.
+        let range = null;
+        if (selection.rangeCount > 0) {
+            const currentRange = selection.getRangeAt(0);
+            if (!currentRange.collapsed && this._isRangeInsideTextBody(currentRange, textBody)) {
+                range = currentRange.cloneRange();
+            }
+        }
+
+        // Fallback to a previously saved in-editor selection.
+        if (!range && this._savedSelection && !this._savedSelection.collapsed && this._isRangeInsideTextBody(this._savedSelection, textBody)) {
+            range = this._savedSelection.cloneRange();
+        }
+
+        if (!range) {
             return;
         }
-        
-        // Check if there's actually selected text
-        if (range.collapsed) {
+
+        const commandName = command === 'bold' ? 'bold' : command === 'underline' ? 'underline' : null;
+        if (!commandName) {
             return;
         }
-        
-        // Get the selected text
-        const selectedText = range.toString();
-        if (!selectedText) {
-            return;
-        }
-        
-        // Create the wrapper element based on command
-        let wrapper;
-        if (command === 'bold') {
-            wrapper = document.createElement('strong');
-        } else if (command === 'underline') {
-            wrapper = document.createElement('u');
-        } else {
-            return;
-        }
-        
-        // Extract the selected content and wrap it
-        const fragment = range.extractContents();
-        wrapper.appendChild(fragment);
-        
-        // Insert the wrapped content
-        range.insertNode(wrapper);
-        
-        // Clear the saved selection
-        this._savedSelection = null;
-        
-        // Update selection to be after the inserted content
+
+        // Apply formatting only to the selected range.
         selection.removeAllRanges();
-        const newRange = document.createRange();
-        newRange.selectNodeContents(wrapper);
-        selection.addRange(newRange);
+        selection.addRange(range);
+        document.execCommand('styleWithCSS', false, false);
+        document.execCommand(commandName, false, null);
+        this._saveSelection();
+    }
+
+    _isRangeInsideTextBody(range, textBody) {
+        if (!range || !textBody) return false;
+        return textBody.contains(range.startContainer) && textBody.contains(range.endContainer);
+    }
+
+    disconnectedCallback() {
+        if (this._selectionChangeHandler) {
+            document.removeEventListener('selectionchange', this._selectionChangeHandler);
+            this._selectionChangeHandler = null;
+        }
     }
 
     _setupResizeHandle() {
@@ -203,70 +216,51 @@ class TextEditorComponent extends HTMLElement {
         if (!resizeHandle) return;
         
         let isResizing = false;
+        let activePointerId = null;
         let startY = 0;
         let startHeight = 0;
-        let targetHeight = 0;
-        let currentHeight = 0;
-        let lastTime = 0;
-        const FRAME_TIME = 1000 / 60; // 16.67ms for 60fps
-        const LERP_FACTOR = 0.55; // Smoothing factor
-        
-        const animate = (timestamp) => {
-            if (!isResizing) return;
-            
-            // Ensure minimum frame time for consistent 60fps
-            if (timestamp - lastTime >= FRAME_TIME) {
-                // Lerp towards target for ultra-smooth motion
-                currentHeight += (targetHeight - currentHeight) * LERP_FACTOR;
-                
-                // Snap if very close to avoid endless tiny updates
-                if (Math.abs(targetHeight - currentHeight) < 0.5) {
-                    currentHeight = targetHeight;
-                }
-                
-                hostElement.style.height = currentHeight + 'px';
-                lastTime = timestamp;
-            }
-            
-            requestAnimationFrame(animate);
+
+        const applyHeightFromCursor = (clientY) => {
+            const deltaY = startY - clientY;
+            const newHeight = Math.max(150, startHeight + deltaY);
+            hostElement.style.height = newHeight + 'px';
         };
         
         const onPointerDown = (e) => {
+            if (isResizing) return;
+
             isResizing = true;
+            activePointerId = e.pointerId;
             startY = e.clientY;
             startHeight = hostElement.offsetHeight;
-            targetHeight = startHeight;
-            currentHeight = startHeight;
-            lastTime = performance.now();
             
             hostElement.classList.add('resizing');
             resizeHandle.classList.add('dragging');
-            resizeHandle.setPointerCapture(e.pointerId);
+            resizeHandle.setPointerCapture(activePointerId);
             
             document.body.style.cursor = 'ns-resize';
-            
-            requestAnimationFrame(animate);
             e.preventDefault();
         };
         
         const onPointerMove = (e) => {
-            if (!isResizing) return;
-            
-            const deltaY = startY - e.clientY;
-            targetHeight = Math.max(150, startHeight + deltaY);
+            if (!isResizing || e.pointerId !== activePointerId) return;
+            applyHeightFromCursor(e.clientY);
         };
         
         const onPointerUp = (e) => {
-            if (!isResizing) return;
+            if (!isResizing || e.pointerId !== activePointerId) return;
             
+            applyHeightFromCursor(e.clientY);
+            const pointerId = activePointerId;
+            if (resizeHandle.hasPointerCapture(pointerId)) {
+                resizeHandle.releasePointerCapture(pointerId);
+            }
+
             isResizing = false;
-            
-            // Final snap to target
-            hostElement.style.height = targetHeight + 'px';
+            activePointerId = null;
             
             hostElement.classList.remove('resizing');
             resizeHandle.classList.remove('dragging');
-            resizeHandle.releasePointerCapture(e.pointerId);
             
             document.body.style.cursor = '';
         };
@@ -275,6 +269,7 @@ class TextEditorComponent extends HTMLElement {
         resizeHandle.addEventListener('pointermove', onPointerMove);
         resizeHandle.addEventListener('pointerup', onPointerUp);
         resizeHandle.addEventListener('pointercancel', onPointerUp);
+        resizeHandle.addEventListener('pointerrawupdate', onPointerMove);
         
         // Prevent touch scrolling on the handle
         resizeHandle.style.touchAction = 'none';

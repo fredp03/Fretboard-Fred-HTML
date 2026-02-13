@@ -126,44 +126,85 @@ class FretboardNeckComponent extends HTMLElement {
         }
 
         let isResizing = false;
-        let startX, startY, startWidth, startHeight;
-
-        handle.addEventListener('mousedown', (e) => {
-            isResizing = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            startWidth = this.offsetWidth;
-            startHeight = this.offsetHeight;
-            e.preventDefault();
-        });
-
-        document.addEventListener('mousemove', (e) => {
+        let activePointerId = null;
+        let pointerOffsetX = 0;
+        let pointerOffsetY = 0;
+        
+        const applyResize = (clientX, clientY) => {
             if (!isResizing) return;
 
-            const newWidth = startWidth + (e.clientX - startX);
-            const newHeight = startHeight + (e.clientY - startY);
+            const parentRect = (this.parentElement || this).getBoundingClientRect();
+            const centerX = parentRect.left + (parentRect.width / 2);
+            const centerY = parentRect.top + (parentRect.height / 2);
 
-            // Store width in pixels, use aspect ratio for height
+            // Handle sits at right:-12 and bottom:-12, so host edge = handle top-left + 12.
+            const hostRight = clientX - pointerOffsetX + 12;
+            const hostBottom = clientY - pointerOffsetY + 12;
+            const newWidth = Math.max(1, (hostRight - centerX) * 2);
+            const newHeight = Math.max(1, (hostBottom - centerY) * 2);
+
+            // Keep the exact same sizing model: width in px + derived aspect ratio.
             const aspectRatio = newWidth / newHeight;
-
             this.style.width = newWidth + 'px';
             this.style.maxWidth = '100%';
             this.style.aspectRatio = aspectRatio;
             this.style.height = 'auto';
+        };
+
+        const finishResize = () => {
+            if (!isResizing) return;
+
+            // Save width as pixels and aspect ratio.
+            const widthPx = this.offsetWidth;
+            const aspectRatio = this.offsetWidth / this.offsetHeight;
+            localStorage.setItem(storageKey, JSON.stringify({
+                widthPx,
+                aspectRatio
+            }));
+
+            isResizing = false;
+            activePointerId = null;
+        };
+
+        handle.addEventListener('pointerdown', (e) => {
+            if (isResizing) return;
+
+            isResizing = true;
+            activePointerId = e.pointerId;
+            const handleRect = handle.getBoundingClientRect();
+            pointerOffsetX = e.clientX - handleRect.left;
+            pointerOffsetY = e.clientY - handleRect.top;
+
+            handle.setPointerCapture(activePointerId);
+            e.preventDefault();
         });
 
-        document.addEventListener('mouseup', () => {
-            if (isResizing) {
-                // Save width as pixels and aspect ratio
-                const widthPx = this.offsetWidth;
-                const aspectRatio = this.offsetWidth / this.offsetHeight;
-                localStorage.setItem(storageKey, JSON.stringify({
-                    widthPx,
-                    aspectRatio
-                }));
-            }
-            isResizing = false;
+        handle.addEventListener('pointermove', (e) => {
+            if (!isResizing || e.pointerId !== activePointerId) return;
+
+            applyResize(e.clientX, e.clientY);
         });
+
+        const onPointerEnd = (e) => {
+            if (!isResizing || e.pointerId !== activePointerId) return;
+
+            applyResize(e.clientX, e.clientY);
+
+            const pointerId = activePointerId;
+            if (handle.hasPointerCapture(pointerId)) {
+                handle.releasePointerCapture(pointerId);
+            }
+
+            finishResize();
+        };
+
+        handle.addEventListener('pointerup', onPointerEnd);
+        handle.addEventListener('pointercancel', onPointerEnd);
+        handle.addEventListener('pointerrawupdate', (e) => {
+            if (!isResizing || e.pointerId !== activePointerId) return;
+            applyResize(e.clientX, e.clientY);
+        });
+        handle.style.touchAction = 'none';
 
         // Double-click to reset to default size
         handle.addEventListener('dblclick', () => {
