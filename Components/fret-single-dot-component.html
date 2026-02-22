@@ -101,7 +101,8 @@
             justify-content: center;
             align-items: center;
             display: flex;
-            overflow: hidden;
+            /* Safari clips fret-note drop-shadows when this overlay container hides overflow. */
+            overflow: visible;
             height: 100%;
             position: relative;
             z-index: 1;
@@ -111,7 +112,7 @@
             grid-row: 1;
             grid-column: 1;
             display: flex;
-            overflow: hidden;
+            overflow: visible;
             height: 100%;
             width: 100%;
             position: relative;

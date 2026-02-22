@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Karla:wght@200;300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <title>Document</title>
 </head>
@@ -33,6 +33,7 @@
 <script src="Javascript/fret-note-component.js"></script>
 <script src="Javascript/toggle-component.js"></script>
 <script src="Javascript/text-editor-component.js"></script>
+<script src="Javascript/note-info-component.js"></script>
 
 
 <body style="margin: 0;">
@@ -43,7 +44,43 @@
 
 <div data-layer="Page" class="Page">
 
-<text-editor></text-editor>
+<div style="display: flex; flex-direction: row; gap: 80px;">
+
+<note-info 
+    title="Selected Notes"
+    style="height:max-content"
+    rows='[
+        {"root": "A", "quality": "R"}, 
+        {"root": "C", "quality": "b3"},
+        {"root": "G#", "quality": "Δ7"}
+
+    ]'>
+    </note-info>
+
+    <note-info 
+        title="Available Triads"
+
+        rows='[
+
+            {"root": "A", "quality": "Minor", "inversion": "R"}, 
+            {"root": "A", "quality": "Minor", "inversion": "1st"},
+            {"root": "c", "quality": "Aug", "inversion": "3rd"}
+
+        ]'>
+        </note-info>
+
+    <note-info 
+        title="Available Chords"
+
+        rows='[
+
+            {"root": "A", "quality": "Min. Maj 7", "inversion": "R"}, 
+            {"root": "C", "quality": "Maj 7 #5", "inversion": "3rd"},
+            {"root": "F", "quality": "Maj 7", "inversion": "1st"}
+
+        ]'>
+        </note-info>
+</div>
 
 </div>
 

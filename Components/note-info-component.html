@@ -1,0 +1,137 @@
+<template id="note-info-template">
+  <style>
+    :host {
+      display: inline-block;
+    }
+
+    .NoteInfoWrapper {
+      width: 100%;
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+
+    .InfoTableContainer {
+      align-self: stretch;
+      background: rgba(214, 214, 210, 0);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+
+    .TitleWrapper {
+      align-self: stretch;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      background: rgba(198, 198, 193, 0);
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .Title {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: black;
+      font-size: 18px;
+      font-family: Karla;
+      font-weight: 300;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      white-space: nowrap;
+    }
+
+    .TableRowsWrapper {
+      align-self: stretch;
+      padding-top: 20px;
+      padding-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .TableRow {
+      align-self: stretch;
+      padding-left: 5px;
+      padding-right: 5px;
+      display: inline-flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .RootAndQuality {
+      flex: 1 1 0;
+      display: flex;
+      justify-content: flex-start;
+      align-items:end;
+      gap: 20px;
+    }
+
+    .Root {
+      width: 24px;
+      color: black;
+      font-size: 20px;
+      font-family: Karla;
+      font-weight: 300;
+      white-space: nowrap;
+    }
+
+    .Quality {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: black;
+      font-size: 15px;
+      font-family: Karla;
+      font-weight: 300;
+      white-space: nowrap;
+    }
+
+    .InversionWrapper {
+      width: 100px;
+      align-self: stretch;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .Inversion {
+      color: black;
+      font-size: 15px;
+      font-family: Karla;
+      font-weight: 200;
+      white-space: nowrap;
+    }
+
+    .Inversion span,
+    .Inversion sup {
+      color: black;
+      font-size: 17px;
+      font-family: Karla;
+      font-weight: 200;
+      white-space: nowrap;
+    }
+  </style>
+
+  <div class="NoteInfoWrapper"> 
+    <div class="InfoTableContainer">
+
+      <div class="TitleWrapper">
+        <div class="Title" data-bind="title">Available Triads</div>
+      </div>
+
+      <div class="TableRowsWrapper">
+        <!-- Rows will be dynamically populated -->
+      </div>
+    </div>
+  </div>
+</template>
