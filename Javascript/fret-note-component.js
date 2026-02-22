@@ -91,10 +91,11 @@ class FretNoteComponent extends HTMLElement {
 
     static instances = new Set();
     static scalePeekActive = false;
+    static scalePeekLocked = false;
+    static _lastPeekKeydownTime = 0;
     static scalePeekListenersAttached = false;
 
     static _setScalePeekActive(active) {
-        FretNoteComponent._collectInstancesFromDom();
         FretNoteComponent.scalePeekActive = active;
         FretNoteComponent.instances.forEach((note) => {
             if (active) {
@@ -127,19 +128,39 @@ class FretNoteComponent extends HTMLElement {
 
         window.addEventListener('keydown', (e) => {
             if (!isPeekKey(e)) return;
+            if (e.repeat) return;
             if (e.altKey || e.ctrlKey || e.metaKey) return;
-            if (FretNoteComponent.scalePeekActive) return;
             if (FretNoteComponent._isEditableEventTarget(e)) return;
-            FretNoteComponent._setScalePeekActive(true);
+
+            const now = Date.now();
+            const timeSinceLast = now - FretNoteComponent._lastPeekKeydownTime;
+            FretNoteComponent._lastPeekKeydownTime = now;
+
+            if (timeSinceLast < 300) {
+                // Double-tap: toggle lock
+                if (FretNoteComponent.scalePeekLocked) {
+                    FretNoteComponent.scalePeekLocked = false;
+                    FretNoteComponent._setScalePeekActive(false);
+                } else {
+                    FretNoteComponent.scalePeekLocked = true;
+                    FretNoteComponent._setScalePeekActive(true);
+                }
+            } else {
+                if (!FretNoteComponent.scalePeekLocked && !FretNoteComponent.scalePeekActive) {
+                    FretNoteComponent._setScalePeekActive(true);
+                }
+            }
         }, { capture: true });
 
         window.addEventListener('keyup', (e) => {
             if (!isPeekKey(e)) return;
+            if (FretNoteComponent.scalePeekLocked) return;
             if (!FretNoteComponent.scalePeekActive) return;
             FretNoteComponent._setScalePeekActive(false);
         }, { capture: true });
 
         window.addEventListener('blur', () => {
+            if (FretNoteComponent.scalePeekLocked) return;
             if (FretNoteComponent.scalePeekActive) {
                 FretNoteComponent._setScalePeekActive(false);
             }
@@ -201,9 +222,29 @@ class FretNoteComponent extends HTMLElement {
         if (noteMarker) {
             noteMarker.addEventListener('click', () => {
                 this.toggleAttribute('active');
-                if (FretNoteComponent.scalePeekActive) {
+
+                // If activating while peek is on, the note is already visible at 0.4
+                // opacity and the CSS transition would produce a noticeable 0→1 lag.
+                // Suppress the transition for one frame so the state snaps instantly.
+                if (this.hasAttribute('active') && noteMarker.style.opacity !== '') {
+                    noteMarker.style.transition = 'none';
+                    noteMarker.style.opacity = '';
+                    requestAnimationFrame(() => {
+                        noteMarker.style.transition = '';
+                    });
+                } else {
                     this._applyScalePeekState();
                 }
+
+                const stringName = this.getAttribute('string-name');
+                const fretNumber = this.getAttribute('fret-number');
+                const note = this._getNoteForPosition(stringName, fretNumber);
+                const degree = this._getScaleDegree(note);
+                const isActive = this.hasAttribute('active');
+
+                document.dispatchEvent(new CustomEvent('note-selection-changed', {
+                    detail: { id: `${stringName}-${fretNumber}`, note, degree, active: isActive }
+                }));
             });
         }
     }
@@ -403,6 +444,9 @@ class FretNoteComponent extends HTMLElement {
         if (!this.shadowRoot.querySelector('.NoteMarker')) return;
 
         switch (name) {
+            case 'active':
+                this._applyScalePeekState();
+                break;
             case 'string-name':
             case 'fret-number':
             case 'display-mode':

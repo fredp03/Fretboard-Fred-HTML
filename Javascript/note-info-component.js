@@ -7,6 +7,7 @@ class NoteInfoComponent extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
+        this._selectedNotes = [];
     }
 
     static get observedAttributes() {
@@ -134,6 +135,65 @@ class NoteInfoComponent extends HTMLElement {
     }
 
     _setupEventHandlers() {
+        if (!this.hasAttribute('selected-notes')) return;
+
+        this._noteSelectionHandler = (e) => {
+            const { id, note, active } = e.detail;
+            if (active) {
+                if (!this._selectedNotes.find(n => n.id === id)) {
+                    this._selectedNotes.push({ id, note });
+                }
+            } else {
+                this._selectedNotes = this._selectedNotes.filter(n => n.id !== id);
+            }
+            this._renderSelectedNotes();
+        };
+
+        this._scaleChangeHandler = (e) => {
+            if (e.detail && (e.detail.field === 'root' || e.detail.field === 'name')) {
+                this._renderSelectedNotes();
+            }
+        };
+
+        document.addEventListener('note-selection-changed', this._noteSelectionHandler);
+        document.addEventListener('change', this._scaleChangeHandler);
+    }
+
+    disconnectedCallback() {
+        if (this._noteSelectionHandler) {
+            document.removeEventListener('note-selection-changed', this._noteSelectionHandler);
+        }
+        if (this._scaleChangeHandler) {
+            document.removeEventListener('change', this._scaleChangeHandler);
+        }
+    }
+
+    _renderSelectedNotes() {
+        const rows = this._selectedNotes.map(({ note }) => ({
+            root: note,
+            quality: this._computeDegree(note)
+        }));
+        this._renderRows(rows);
+    }
+
+    _computeDegree(note) {
+        const chromaticNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const degreeNames = { 0: '1', 1: 'b2', 2: '2', 3: 'b3', 4: '3', 5: '4', 6: 'b5', 7: '5', 8: 'b6', 9: '6', 10: 'b7', 11: '7' };
+        const sharpFourScales = ['Lydian', 'Lydian Augmented', 'Lydian Dominant'];
+        const flatToSharp = { 'Db': 'C#', 'Eb': 'D#', 'Fb': 'E', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#', 'Cb': 'B' };
+        const normalize = (n) => flatToSharp[n] || n;
+
+        const scaleSelector = document.querySelector('scale-selector');
+        const rootNote = scaleSelector ? (scaleSelector.getAttribute('root') || 'C') : 'C';
+        const scaleName = scaleSelector ? (scaleSelector.getAttribute('name') || 'Major') : 'Major';
+
+        const noteIndex = chromaticNotes.indexOf(normalize(note));
+        const rootIndex = chromaticNotes.indexOf(normalize(rootNote));
+        if (noteIndex === -1 || rootIndex === -1) return note;
+
+        const semitones = (noteIndex - rootIndex + 12) % 12;
+        if (semitones === 6 && sharpFourScales.includes(scaleName)) return '#4';
+        return degreeNames[semitones] ?? note;
     }
 
     attributeChangedCallback(name, oldValue, newValue) {

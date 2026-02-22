@@ -129,38 +129,47 @@ class FretboardNeckComponent extends HTMLElement {
         let activePointerId = null;
         let pointerOffsetX = 0;
         let pointerOffsetY = 0;
-        
-        const applyResize = (clientX, clientY) => {
-            if (!isResizing) return;
+        let cachedCenterX = 0;
+        let cachedCenterY = 0;
+        let rafPending = false;
+        let latestClientX = 0;
+        let latestClientY = 0;
+        const supportsRawUpdate = ('onpointerrawupdate' in window);
 
-            const parentRect = (this.parentElement || this).getBoundingClientRect();
-            const centerX = parentRect.left + (parentRect.width / 2);
-            const centerY = parentRect.top + (parentRect.height / 2);
+        const applyResize = () => {
+            rafPending = false;
 
-            // Handle sits at right:-12 and bottom:-12, so host edge = handle top-left + 12.
-            const hostRight = clientX - pointerOffsetX + 12;
-            const hostBottom = clientY - pointerOffsetY + 12;
-            const newWidth = Math.max(1, (hostRight - centerX) * 2);
-            const newHeight = Math.max(1, (hostBottom - centerY) * 2);
+            const hostRight = latestClientX - pointerOffsetX + 12;
+            const hostBottom = latestClientY - pointerOffsetY + 12;
+            const newWidth = Math.max(1, (hostRight - cachedCenterX) * 2);
+            const newHeight = Math.max(1, (hostBottom - cachedCenterY) * 2);
 
-            // Keep the exact same sizing model: width in px + derived aspect ratio.
             const aspectRatio = newWidth / newHeight;
-            this.style.width = newWidth + 'px';
-            this.style.maxWidth = '100%';
-            this.style.aspectRatio = aspectRatio;
-            this.style.height = 'auto';
+            this.style.cssText = `width:${newWidth}px;max-width:100%;aspect-ratio:${aspectRatio};height:auto;will-change:width;`;
+        };
+
+        const scheduleResize = (clientX, clientY) => {
+            if (!isResizing) return;
+            latestClientX = clientX;
+            latestClientY = clientY;
+            if (!rafPending) {
+                rafPending = true;
+                requestAnimationFrame(applyResize);
+            }
         };
 
         const finishResize = () => {
             if (!isResizing) return;
 
-            // Save width as pixels and aspect ratio.
+            // Cancel any pending rAF
+            rafPending = false;
+
+            // Commit final size without will-change
             const widthPx = this.offsetWidth;
             const aspectRatio = this.offsetWidth / this.offsetHeight;
-            localStorage.setItem(storageKey, JSON.stringify({
-                widthPx,
-                aspectRatio
-            }));
+            this.style.cssText = `width:${widthPx}px;max-width:100%;aspect-ratio:${aspectRatio};height:auto;`;
+
+            localStorage.setItem(storageKey, JSON.stringify({ widthPx, aspectRatio }));
 
             isResizing = false;
             activePointerId = null;
@@ -175,20 +184,34 @@ class FretboardNeckComponent extends HTMLElement {
             pointerOffsetX = e.clientX - handleRect.left;
             pointerOffsetY = e.clientY - handleRect.top;
 
+            // Cache parent centre once — it won't change during the drag
+            const parentRect = (this.parentElement || this).getBoundingClientRect();
+            cachedCenterX = parentRect.left + parentRect.width / 2;
+            cachedCenterY = parentRect.top + parentRect.height / 2;
+
             handle.setPointerCapture(activePointerId);
             e.preventDefault();
         });
 
-        handle.addEventListener('pointermove', (e) => {
-            if (!isResizing || e.pointerId !== activePointerId) return;
-
-            applyResize(e.clientX, e.clientY);
-        });
+        // Use pointerrawupdate in Chrome (higher frequency, already rAF-throttled).
+        // Fall back to pointermove in Safari (which doesn't support pointerrawupdate).
+        if (supportsRawUpdate) {
+            handle.addEventListener('pointerrawupdate', (e) => {
+                if (!isResizing || e.pointerId !== activePointerId) return;
+                scheduleResize(e.clientX, e.clientY);
+            });
+        } else {
+            handle.addEventListener('pointermove', (e) => {
+                if (!isResizing || e.pointerId !== activePointerId) return;
+                scheduleResize(e.clientX, e.clientY);
+            });
+        }
 
         const onPointerEnd = (e) => {
             if (!isResizing || e.pointerId !== activePointerId) return;
 
-            applyResize(e.clientX, e.clientY);
+            latestClientX = e.clientX;
+            latestClientY = e.clientY;
 
             const pointerId = activePointerId;
             if (handle.hasPointerCapture(pointerId)) {
@@ -200,10 +223,6 @@ class FretboardNeckComponent extends HTMLElement {
 
         handle.addEventListener('pointerup', onPointerEnd);
         handle.addEventListener('pointercancel', onPointerEnd);
-        handle.addEventListener('pointerrawupdate', (e) => {
-            if (!isResizing || e.pointerId !== activePointerId) return;
-            applyResize(e.clientX, e.clientY);
-        });
         handle.style.touchAction = 'none';
 
         // Double-click to reset to default size
