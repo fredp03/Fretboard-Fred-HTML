@@ -60,6 +60,7 @@ class TabMenuItemComponent extends HTMLElement {
         const item = this.shadowRoot.querySelector('.TabMenuItem');
         if (item) {
             item.classList.toggle('selected', isSelected);
+            item.setAttribute('aria-selected', String(isSelected));
         }
     }
 
@@ -71,6 +72,12 @@ class TabMenuItemComponent extends HTMLElement {
                     this.removeAttribute('selected');
                 } else {
                     this.setAttribute('selected', '');
+                }
+            });
+            item.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    item.click();
                 }
             });
         }
