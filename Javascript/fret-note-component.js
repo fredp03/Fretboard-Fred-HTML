@@ -94,6 +94,7 @@ class FretNoteComponent extends HTMLElement {
     static scalePeekLocked = false;
     static _lastPeekKeydownTime = 0;
     static scalePeekListenersAttached = false;
+    static triadListenersAttached = false;
 
     static _setScalePeekActive(active) {
         FretNoteComponent.scalePeekActive = active;
@@ -167,6 +168,88 @@ class FretNoteComponent extends HTMLElement {
         });
     }
 
+    static _ensureTriadListeners() {
+        if (FretNoteComponent.triadListenersAttached) return;
+        FretNoteComponent.triadListenersAttached = true;
+
+        document.addEventListener('triad-preview-start', (e) => {
+            const { voicing } = e.detail;
+            FretNoteComponent.instances.forEach((note) => {
+                const str = note.getAttribute('string-name');
+                const fret = parseInt(note.getAttribute('fret-number'));
+                const entry = voicing[str];
+                if (entry && parseInt(entry.fret) === fret) {
+                    note.setAttribute('triad-preview', '');
+                } else {
+                    note.removeAttribute('triad-preview');
+                }
+            });
+        });
+
+        document.addEventListener('triad-preview-end', () => {
+            FretNoteComponent.instances.forEach((note) => {
+                note.removeAttribute('triad-preview');
+            });
+        });
+
+        document.addEventListener('triad-select', (e) => {
+            const { voicing, additive } = e.detail;
+
+            // For shift-click: check if every voicing note is already active.
+            // If so, treat this as a removal instead of an addition.
+            let removeVoicing = false;
+            if (additive) {
+                const voicingEntries = Object.entries(voicing);
+                removeVoicing = voicingEntries.every(([str, entry]) =>
+                    [...FretNoteComponent.instances].some(n =>
+                        n.getAttribute('string-name') === str &&
+                        parseInt(n.getAttribute('fret-number')) === parseInt(entry.fret) &&
+                        n.hasAttribute('active')
+                    )
+                );
+            }
+
+            FretNoteComponent.instances.forEach((note) => {
+                const str = note.getAttribute('string-name');
+                const fret = parseInt(note.getAttribute('fret-number'));
+                const entry = voicing[str];
+                const inVoicing = !!(entry && parseInt(entry.fret) === fret);
+                const isActive = note.hasAttribute('active');
+
+                const dispatch = (active) => {
+                    const noteName = note._getNoteForPosition(str, String(fret));
+                    const degree = note._getScaleDegree(noteName);
+                    document.dispatchEvent(new CustomEvent('note-selection-changed', {
+                        detail: { id: `${str}-${fret}`, note: noteName, degree, stringName: str, active }
+                    }));
+                };
+
+                if (removeVoicing) {
+                    // Shift-click on fully-active triad: deactivate its notes only.
+                    if (inVoicing && isActive) {
+                        note.removeAttribute('active');
+                        dispatch(false);
+                    }
+                } else if (additive) {
+                    // Shift-click on non-fully-active triad: add its notes.
+                    if (inVoicing && !isActive) {
+                        note.setAttribute('active', '');
+                        dispatch(true);
+                    }
+                } else {
+                    // Normal click: replace entire selection.
+                    if (inVoicing && !isActive) {
+                        note.setAttribute('active', '');
+                        dispatch(true);
+                    } else if (!inVoicing && isActive) {
+                        note.removeAttribute('active');
+                        dispatch(false);
+                    }
+                }
+            });
+        });
+    }
+
     static _collectInstancesFromDom() {
         const fretboard = document.querySelector('fretboard-neck');
         if (!fretboard || !fretboard.shadowRoot) return;
@@ -215,6 +298,7 @@ class FretNoteComponent extends HTMLElement {
         this._setupScaleListener();
 
         FretNoteComponent._ensureScalePeekListeners();
+        FretNoteComponent._ensureTriadListeners();
     }
 
     _setupClickHandler() {
@@ -243,7 +327,7 @@ class FretNoteComponent extends HTMLElement {
                 const isActive = this.hasAttribute('active');
 
                 document.dispatchEvent(new CustomEvent('note-selection-changed', {
-                    detail: { id: `${stringName}-${fretNumber}`, note, degree, active: isActive }
+                    detail: { id: `${stringName}-${fretNumber}`, note, degree, stringName, active: isActive }
                 }));
             });
         }

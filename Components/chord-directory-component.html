@@ -1,0 +1,60 @@
+<template id="chord-directory-template">
+    <style>
+        :host {
+            display: block;
+        }
+        .ChordDirectoryWrapper {
+            width: 531px;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            border-radius: 13px;
+            background: #262626;
+            box-shadow: 1px 1px 2px 0 rgba(66, 66, 66, 0.30) inset, -1px -1px 2px 0 rgba(16, 16, 16, 0.50) inset, -1px 1px 2px 0 rgba(16, 16, 16, 0.20), 1px -1px 2px 0 rgba(16, 16, 16, 0.20), -1px -1px 2px 0 rgba(66, 66, 66, 0.90), 1px 1px 3px 0 rgba(16, 16, 16, 0.90);
+        }
+        .TabBar {
+            width: 100%;
+            height: 55px;
+            border-radius: 13px;
+            background: #262626;
+            box-shadow: -1px 1px 2px 0 rgba(25, 25, 25, 0.20) inset, 1px -1px 2px 0 rgba(25, 25, 25, 0.20) inset, -1px -1px 2px 0 rgba(63, 63, 63, 0.90) inset, 1px 1px 3px 0 rgba(25, 25, 25, 0.90) inset;           
+        }
+        .NotesAndInversions {
+            
+        }
+
+
+
+    </style>
+
+    <div class="ChordDirectoryWrapper">
+
+        <div class="TabBar"></div>
+        
+        <notes-and-inversions title="Notes And Inversions" style="width: 100%;"
+            inversion="1st"
+            root="A"
+            quality="Major 7"
+            note-1="1"
+            note-2="3"
+            note-3="5"
+            note-4="7">
+        </notes-and-inversions>
+        
+        <notes-and-inversions title="Notes And Inversions" style="width: 100%;"
+            inversion="2nd"
+            root="B"
+            quality="Minor 7"
+            note-1="5"
+            note-2="7"
+            note-3="1"
+            note-4="3">
+        </notes-and-inversions>
+
+
+
+
+    
+    </div>
+</template>

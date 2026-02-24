@@ -4,13 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#E0DFDC">
+    <meta name="theme-color" content="#383838">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Karla:wght@200;300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lekton:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <title>‎ </title>
 
 </head>
@@ -22,6 +23,8 @@
 <script src="Javascript/scale-selector-component.js"></script>
 <script src="Javascript/text-editor-component.js"></script>
 <script src="Javascript/note-info-component.js"></script>
+<script src="Javascript/chord-directory-component.js"></script>
+<script src="Javascript/Info Card/notes-and-inversions-component.js"></script>
 
 <style>
     * {
@@ -40,7 +43,7 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        background-color: #E0DFDC;
+        background-color: #383838;
     }
 
     .FretboardSection {
@@ -84,12 +87,13 @@
 
     .ControlBar {
         display: flex;
+        background-color: #494949;
         width: 100%;
         padding-left: 40px;
         padding-right: 40px;
-        padding-top: 30px;
-        padding-bottom: 30px;
-        align-items: flex-start;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        align-items: center;
         justify-content: space-between;
         gap: 40px;
     }
@@ -120,36 +124,7 @@
         <fretboard-neck class="Fretboard" frets="15"></fretboard-neck>
     </div>
     <div data-layer="Middle Section" class="MiddleSection">
-
-        <note-info
-            title="Selected Notes"
-            selected-notes
-            style="height:max-content">
-        </note-info>
-
-            <note-info 
-                title="Available Triads"
-
-                rows='[
-
-                    {"root": "A", "quality": "Minor", "inversion": "R"}, 
-                    {"root": "A", "quality": "Minor", "inversion": "1"},
-                    {"root": "c", "quality": "Aug", "inversion": "3"}
-
-                ]'>
-                </note-info>
-
-            <note-info 
-                title="Available Chords"
-
-                rows='[
-
-                    {"root": "A", "quality": "Min. Maj 7", "inversion": "R"}, 
-                    {"root": "C", "quality": "Maj 7 #5", "inversion": "3"},
-                    {"root": "F", "quality": "Maj 7", "inversion": "1"}
-
-                ]'>
-                </note-info>
+        <chord-directory title="Chord Directory"></chord-directory>
 
     </div>
     <div data-layer="Bottom Section" class="BottomSection">

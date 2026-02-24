@@ -43,6 +43,12 @@
             opacity: 0.4;
         }
 
+        /* Triad preview state - blue tint */
+        :host([triad-preview]) .NoteMarker {
+            opacity: 0.6;
+            filter: hue-rotate(210deg) saturate(1.2) brightness(1.1);
+        }
+
         /* In-scale notes - green tint only, no drop-shadow in filter */
         :host([in-scale]) .NoteMarker {
             filter: hue-rotate(85deg) saturate(0.8);

@@ -1,0 +1,69 @@
+<template id="notes-and-inversions-template">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .NotesAndInversionsWrapper {
+            display: flex;
+
+            padding: 12px 25px;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 0.5px solid rgba(85, 85, 85, 0.56);
+        }
+        .Chord,
+        .Inversion {
+            display: flex;
+            height: 22px;
+            align-items: center;
+            gap: 12px;
+            flex: 1 0 0;          
+        }
+        .NoteOrder {
+            display: flex;
+            height: 22px;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            flex: 1 0 0;
+        }
+        .ItemText {
+            color: #a3a3a3;
+            font-family: Lekton;
+            font-size: 15px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: normal;
+            white-space: nowrap;
+        }
+
+    </style>
+
+    <div class="NotesAndInversionsWrapper">
+
+        <div class="Chord">
+
+            <div class="ItemText" data-chord="root">A</div>
+            <div class="ItemText" data-chord="quality">Major 7</div>
+
+        </div>
+
+        <div class="Inversion">
+
+            <div class="ItemText" data-inversion="inversion">1st</div>
+            <div class="ItemText">Inversion</div>   
+
+        </div>
+
+        <div class="NoteOrder">
+            <div class="ItemText" data-note="note-1">1</div>
+            <div class="ItemText" data-note="note-2">3</div>   
+            <div class="ItemText" data-note="note-3">5</div>
+            <div class="ItemText" data-note="note-4">7</div>  
+        </div>
+
+    <img src="../../Assets/PeakIcon.svg" alt="peak icon">
+
+    </div>
+</template>

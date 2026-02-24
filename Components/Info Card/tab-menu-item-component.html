@@ -1,0 +1,25 @@
+<template id="tab-menu-item-template">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .TabMenuItemWrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .Label {
+            font-family: 'Karla', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            color: #2B2B2B;
+        }
+    </style>
+
+    <div class="TabMenuItemWrapper">
+        <div class="Label" data-bind="label">Tab Menu Item</div>
+    </div>
+</template>

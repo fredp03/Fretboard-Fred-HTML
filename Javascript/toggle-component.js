@@ -3,6 +3,7 @@ class ToggleComponent extends HTMLElement {
     static template = null;
     static templateLoaded = false;
     static templatePromise = null;
+    static keyboardListenersAttached = false;
 
     constructor() {
         super();
@@ -228,6 +229,46 @@ class ToggleComponent extends HTMLElement {
         if (slider) {
             slider.addEventListener('click', () => this._toggle());
         }
+        ToggleComponent._ensureKeyboardListeners();
+    }
+
+    static _ensureKeyboardListeners() {
+        if (ToggleComponent.keyboardListenersAttached) return;
+        ToggleComponent.keyboardListenersAttached = true;
+
+        const isEditableTarget = (e) => {
+            const path = e.composedPath ? e.composedPath() : [e.target];
+            return path.some(el => {
+                if (!(el instanceof HTMLElement)) return false;
+                if (el.isContentEditable) return true;
+                return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT';
+            });
+        };
+
+        window.addEventListener('keydown', (e) => {
+            if (e.repeat || e.altKey || e.ctrlKey || e.metaKey) return;
+            if (isEditableTarget(e)) return;
+
+            if (e.code === 'KeyN' || e.key === 'n' || e.key === 'N') {
+                const toggle = document.getElementById('note-names-toggle');
+                if (toggle && typeof toggle._toggle === 'function') toggle._toggle();
+            }
+
+            if (e.code === 'KeyC' || e.key === 'c' || e.key === 'C') {
+                FretNoteComponent.instances.forEach((note) => {
+                    if (note.hasAttribute('active')) {
+                        note.removeAttribute('active');
+                        const str = note.getAttribute('string-name');
+                        const fret = note.getAttribute('fret-number');
+                        const noteName = note._getNoteForPosition(str, fret);
+                        const degree = note._getScaleDegree(noteName);
+                        document.dispatchEvent(new CustomEvent('note-selection-changed', {
+                            detail: { id: `${str}-${fret}`, note: noteName, degree, stringName: str, active: false }
+                        }));
+                    }
+                });
+            }
+        }, { capture: true });
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
