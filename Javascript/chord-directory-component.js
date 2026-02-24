@@ -56,7 +56,24 @@ class ChordDirectoryComponent extends HTMLElement {
     }
 
     _setupEventHandlers() {
-        // Add event listeners and interactive behavior
+        const tabBar = this.shadowRoot.querySelector('.TabBar');
+        const tabs = this.shadowRoot.querySelectorAll('tab-menu-item');
+
+        // Default: select the first tab
+        if (tabs.length > 0) {
+            tabs[0].setAttribute('selected', '');
+        }
+
+        // Exclusive selection — deselect all, then select the clicked tab
+        if (tabBar) {
+            tabBar.addEventListener('click', (e) => {
+                const clickedTab = e.target.closest('tab-menu-item');
+                if (!clickedTab) return;
+
+                tabs.forEach(tab => tab.removeAttribute('selected'));
+                clickedTab.setAttribute('selected', '');
+            });
+        }
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
