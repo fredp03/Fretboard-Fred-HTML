@@ -7,16 +7,17 @@
         .NotesAndInversionsWrapper {
             display: flex;
 
-            padding: 15px 25px;
+            padding: 15px 0px;
             justify-content: space-between;
             align-items: center;
-            border-bottom: var(--notes-border-bottom, 0.5px solid rgba(85, 85, 85, 0.56));
+            border-bottom: 0.5px solid rgba(85, 85, 85, 0.56);
         }
         .Chord,
         .Inversion {
             display: flex;
             height: 22px;
             align-items: center;
+            padding: 0px 25px;
             gap: 12px;
             flex: 1 0 0;          
         }
@@ -27,6 +28,7 @@
             align-items: center;
             gap: 5px;
             flex: 1 0 0;
+            padding: 0px 25px;
         }
         .ItemText {
             color: #a3a3a3;
@@ -36,6 +38,9 @@
             font-weight: 400;
             line-height: normal;
             white-space: nowrap;
+        }
+        .icon {
+            padding: 0px 25px;
         }
 
     </style>
@@ -52,7 +57,7 @@
         <div class="Inversion">
 
             <div class="ItemText" data-inversion="inversion">1st</div>
-            <div class="ItemText">Inversion</div>   
+            <div class="ItemText">Inv</div>   
 
         </div>
 
@@ -63,7 +68,7 @@
             <div class="ItemText" data-note="note-4">7</div>  
         </div>
 
-    <img src="../../Assets/PeakIcon.svg" alt="peak icon">
+    <img class="icon" src="../../Assets/PeakIcon.svg" alt="peak icon">
 
     </div>
 </template>

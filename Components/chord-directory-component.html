@@ -4,7 +4,7 @@
             display: block;
         }
         .ChordDirectoryWrapper {
-            width: 531px;
+            width: fit-content;
             height: auto;
             display: flex;
             flex-direction: column;
@@ -15,6 +15,9 @@
         }
         notes-and-inversions:last-of-type {
             --notes-border-bottom: none;
+        }
+        .RowsContainer {
+            width: 100%;
         }
         .TabBar {
             width: 100%;
@@ -36,39 +39,9 @@
 
     <div class="ChordDirectoryWrapper">
 
-        <div class="TabBar">
+        <div class="TabBar"></div>
 
-            <tab-menu-item label="Root"></tab-menu-item>
-            <tab-menu-item label="Drop 2"></tab-menu-item>
-            <tab-menu-item label="Drop 3"></tab-menu-item>
-            <tab-menu-item label="Imposed"></tab-menu-item>
-            <tab-menu-item label="Spread"></tab-menu-item>
+        <div class="RowsContainer"></div>
 
-        </div>
-        
-        <notes-and-inversions title="Notes And Inversions" style="width: 100%;"
-            inversion="1st"
-            root="A"
-            quality="Major 7"
-            note-1="1"
-            note-2="3"
-            note-3="5"
-            note-4="7">
-        </notes-and-inversions>
-        
-        <notes-and-inversions title="Notes And Inversions" style="width: 100%;"
-            inversion="2nd"
-            root="B"
-            quality="Minor 7"
-            note-1="5"
-            note-2="7"
-            note-3="1"
-            note-4="3">
-        </notes-and-inversions>
-
-
-
-
-    
     </div>
 </template>
