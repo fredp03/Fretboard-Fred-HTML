@@ -3,23 +3,44 @@
         :host {
             display: block;
         }
-
-        .TabMenuItemWrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding: 16px;
-        }
-
-        .Label {
-            font-family: 'Karla', sans-serif;
-            font-weight: 500;
+        .TabLabel {
+            color: #A4A4A4;
+            font-family: Lekton;
             font-size: 14px;
-            color: #2B2B2B;
+            font-style: normal;
+            font-weight: 400;
+            line-height: normal;
         }
-    </style>
+        .TabMenuItem {
+            display: flex;
+            padding: 8px 17px;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            border-radius: 10px;
+            border: 0.5px solid #606060;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .TabMenuItem.selected {
+            border: 0.5px solid #8D8D8D;
+            background: #222;
+            box-shadow: -1px 1px 2px 0 rgba(23, 23, 23, 0.20), 1px -1px 2px 0 rgba(23, 23, 23, 0.20), 1px 1px 3px 0 rgba(23, 23, 23, 0.90);
+        }
+        .TabMenuItemWrapper {
+            display: inline-flex;
+            padding: 0 13px;
+            justify-content: center;
+            align-items: center;
+        }
 
+
+    </style>
     <div class="TabMenuItemWrapper">
-        <div class="Label" data-bind="label">Tab Menu Item</div>
+        <div class="TabMenuItem">
+            <div class="TabLabel" data-bind="label">Label</div>
+        </div>
     </div>
+
+
 </template>

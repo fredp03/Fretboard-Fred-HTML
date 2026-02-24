@@ -10,7 +10,7 @@ class TabMenuItemComponent extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ['label'];
+        return ['label', 'selected'];
     }
 
     async connectedCallback() {
@@ -46,6 +46,7 @@ class TabMenuItemComponent extends HTMLElement {
     _bindAttributes() {
         const label = this.getAttribute('label') || 'Tab Menu Item';
         this._updateBinding('label', label);
+        this._updateSelected(this.hasAttribute('selected'));
     }
 
     _updateBinding(bindName, value) {
@@ -55,8 +56,24 @@ class TabMenuItemComponent extends HTMLElement {
         }
     }
 
+    _updateSelected(isSelected) {
+        const item = this.shadowRoot.querySelector('.TabMenuItem');
+        if (item) {
+            item.classList.toggle('selected', isSelected);
+        }
+    }
+
     _setupEventHandlers() {
-        // Add event listeners and interactive behavior
+        const item = this.shadowRoot.querySelector('.TabMenuItem');
+        if (item) {
+            item.addEventListener('click', () => {
+                if (this.hasAttribute('selected')) {
+                    this.removeAttribute('selected');
+                } else {
+                    this.setAttribute('selected', '');
+                }
+            });
+        }
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -67,6 +84,9 @@ class TabMenuItemComponent extends HTMLElement {
         switch (name) {
             case 'label':
                 this._updateBinding('label', newValue);
+                break;
+            case 'selected':
+                this._updateSelected(newValue !== null);
                 break;
         }
     }
