@@ -1,0 +1,54 @@
+<template id="search-bar-template">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .SearchBarWrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            align-self: stretch;
+            padding: 0 20px;
+            width: 505px;
+            height: 37px;
+            border-radius: 10px;
+            border: 1px solid #494949;
+            background: #353535;
+        }
+        .ChordSearchText {
+            color: #929292;
+            text-align: center;
+            leading-trim: both;
+            text-edge: cap;
+            font-family: Lekton;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: normal;
+        }
+        .Icon {
+            width: 24px;
+            height: 50%;
+            aspect-ratio: 1 / 1;
+            background-image: url('../../Assets/SearchIcon.svg');
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+        }
+        .Spacer {
+            width: 24px;
+            height: 100%;
+        }
+
+
+
+    </style>
+
+    <div class="SearchBarWrapper">
+        <div class="Spacer"></div>
+        <div class="ChordSearchText">G7</div>
+        <div class="Icon"></div>
+        
+    </div>
+</template>

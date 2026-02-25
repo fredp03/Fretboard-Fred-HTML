@@ -1,0 +1,103 @@
+<template id="chord-search-result-template">
+    <style>
+        :host {
+            display: block;
+        }
+
+        .ScaleSearcher {
+            display: flex;
+            width: 100%;
+            padding: 20px 0;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            border-bottom: 0.5px solid rgba(85, 85, 85, 0.56);
+            container-type: inline-size;
+        }
+
+        .RootAndQuality,
+        .ParentInfo {
+            display: flex;
+            height: 22px;
+            align-items: center;
+            gap: 12px;
+            flex: 1 0 0;
+            width: 33%;
+            overflow: hidden;
+        }
+
+        .ResolutionInfo {
+            display: flex;
+            width: 68px;
+            padding-left: 14px;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
+            flex-shrink: 0;
+            align-self: stretch;
+        }
+
+        .RootAndQualityText {
+            color: #929292;
+            leading-trim: both;
+            text-edge: cap;
+            font-family: Lekton;
+            font-size: 13px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: normal;
+            white-space: nowrap;
+        }
+
+        .ParentScaleText,
+        .ResolutionInfoText {
+            color: #929292;
+            leading-trim: both;
+            text-edge: cap;
+            font-family: Lekton;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: normal;
+            white-space: nowrap;
+        }
+
+        @container (max-width: 380px) {
+            .ParentInfo {
+                display: none;
+            }
+        }
+
+
+    </style>
+
+    <div class="ScaleSearcher">
+
+        <div class="RootAndQuality">
+
+          <div class="RootAndQualityText" data-bind="scale-root">F#</div>
+          <div class="RootAndQualityText" data-bind="scale-name">Phrygian Dominant</div>
+
+      </div>
+
+      <div class="ParentInfo">
+
+        <div class="ParentScaleText" data-bind="parent-root">C#</div>
+        <div class="ParentScaleText" data-bind="parent-scale">Harmonic Minor</div>
+        <div class="ParentScaleText" data-bind="parent-mode">Mode 5</div>
+
+      </div>
+
+      <div class="ResolutionInfo">
+
+        <div class="ResolutionInfoText" data-bind="current-function">V/bII</div>
+        <div class="ResolutionInfoText">→</div>
+        <div class="ResolutionInfoText" data-bind="target-chord">C</div>
+
+      </div>
+
+    </div>
+
+    </div>
+
+</template>

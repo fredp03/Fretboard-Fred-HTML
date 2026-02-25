@@ -123,6 +123,7 @@ class ChordDirectoryComponent extends HTMLElement {
 
         this._renderTabs(['Root Pos', 'Drop 2', 'Drop 3']);
         this._setupEventHandlers();
+        this._renderActiveRows();
     }
 
     disconnectedCallback() {

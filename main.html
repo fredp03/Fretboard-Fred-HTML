@@ -26,8 +26,14 @@
 <script src="Javascript/chord-directory-component.js"></script>
 <script src="Javascript/Info Card/notes-and-inversions-component.js"></script>
 <script src="Javascript/Info Card/tab-menu-item-component.js"></script>
+<script src="Javascript/Search Bar/search-bar-component-open.js"></script>
+<script src="Javascript/Search Bar/chord-search-result-component.js"></script>
 
 <style>
+    :root {
+        --cd-header-height: 65px;
+    }
+
     * {
         box-sizing: border-box;
         user-select: none;
@@ -64,8 +70,32 @@
         min-height: fit-content;
         justify-content: center;
         align-items: flex-start;
-        gap: 20%;
-        padding: 40px;
+
+    }
+
+    .MiddleLeftSection {
+
+        display: flex;
+        padding: 41px;
+        width: 100%;
+        min-height: fit-content;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 82.5px;
+        flex: 1 0 0;
+        align-self: stretch;
+    }
+    
+    .MiddleRightSection {
+        display: flex;
+        padding: 41px;
+        width: 100%;
+        min-height: fit-content;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 82.5px;
+        flex: 1 0 0;
+        align-self: stretch;
     }
 
     .BottomSection {
@@ -128,7 +158,15 @@
         <fretboard-neck class="Fretboard" frets="15"></fretboard-neck>
     </div>
     <div data-layer="Middle Section" class="MiddleSection">
-        <chord-directory></chord-directory>
+
+        <div data-layer="Middle Left" class="MiddleLeftSection">
+            <chord-directory></chord-directory>
+        </div>
+
+        <div data-layer="Middle Right" class="MiddleRightSection">
+            <search-bar-open></search-bar-open>
+        </div>
+        
 
     </div>
     <div data-layer="Bottom Section" class="BottomSection">

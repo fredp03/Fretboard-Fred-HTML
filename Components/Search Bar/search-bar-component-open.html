@@ -1,0 +1,100 @@
+<template id="search-bar-template">
+    <style>
+        :host {
+            display: block;
+            width: 90%;
+            --cd-surface-1: #262626;
+            --cd-surface-2: #2e2e2e;
+            --cd-surface-3: #222222;
+            --cd-stroke-soft: rgba(255, 255, 255, 0.06);
+        }
+
+        .SearchBarWrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            align-self: stretch;
+            padding: 0 20px;
+            width: 100%;
+            box-sizing: border-box;
+            height: var(--cd-header-height);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(180deg, #323232 0%, #2a2a2a 100%);
+            box-shadow:
+                -1px 1px 2px rgba(20, 20, 20, 0.24) inset,
+                1px -1px 2px rgba(20, 20, 20, 0.20) inset,
+                -1px -1px 2px rgba(60, 60, 60, 0.55) inset,
+                0 1px 0 rgba(255, 255, 255, 0.03) inset,
+                0 -1px 0 rgba(0, 0, 0, 0.20) inset;
+        }
+        .ChordSearchText {
+            color: #929292;
+            text-align: center;
+            leading-trim: both;
+            text-edge: cap;
+            font-family: Lekton;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: normal;
+        }
+        .Icon {
+            width: 24px;
+            height: 50%;
+            aspect-ratio: 1 / 1;
+            background-image: url('../../Assets/SearchIcon.svg');
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+        }
+        .Spacer {
+            width: 24px;
+            height: 100%;
+        }
+        .SearchBarOpen {
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0px;
+            border-radius: 16px;
+            border: 1px solid var(--cd-stroke-soft);
+            box-shadow: 0 2px 4.1px 0 rgba(0, 0, 0, 0.81);
+            background: linear-gradient(180deg, #323232 0%, var(--cd-surface-1) 45%, var(--cd-surface-3) 100%);
+            overflow: hidden;
+        }
+        .SearchResults {
+            display: flex;
+            width: 100%;
+            box-sizing: border-box;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 13px;
+            padding: 0 14px;
+        }
+
+
+    </style>
+
+    <div class="SearchBarOpen">
+
+        <div class="SearchBarWrapper">
+            <div class="Spacer"></div>
+            <div class="ChordSearchText">G7</div>
+            <div class="Icon"></div>
+        </div>
+
+       <div class="SearchResults">
+
+        <chord-search-result scale-root="F#" scale-name="Phrygian Dominant" parent-root="C#" parent-scale="Harmonic Minor" parent-mode="Mode 5" current-function="V/bII" target-chord=""></chord-search-result>
+        <chord-search-result scale-root="F#" scale-name="Phrygian Dominant" parent-root="C#" parent-scale="Harmonic Minor" parent-mode="Mode 5" current-function="V/bII" target-chord=""></chord-search-result>
+        <chord-search-result scale-root="F#" scale-name="Phrygian Dominant" parent-root="C#" parent-scale="Harmonic Minor" parent-mode="Mode 5" current-function="V/bII" target-chord=""></chord-search-result>
+
+        </div>
+
+    </div>
+
+
+
+
+</template>
