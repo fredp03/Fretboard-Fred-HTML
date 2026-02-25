@@ -11,6 +11,11 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: var(--notes-border-bottom, 0.5px solid rgba(85, 85, 85, 0.56));
+            cursor: default;
+            transition: background 0.15s ease;
+        }
+        .NotesAndInversionsWrapper:hover {
+            background: rgba(255, 255, 255, 0.04);
         }
         .Chord,
         .Inversion {
@@ -41,6 +46,12 @@
         }
         .icon {
             padding: 0px 25px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.15s ease;
+        }
+        .icon:hover {
+            opacity: 1;
         }
 
     </style>
@@ -68,7 +79,7 @@
             <div class="ItemText" data-note="note-4">7</div>  
         </div>
 
-    <img class="icon" src="../../Assets/PeakIcon.svg" alt="peak icon">
+    <img class="icon" data-action="peek" src="../../Assets/PeakIcon.svg" alt="peak icon">
 
     </div>
 </template>

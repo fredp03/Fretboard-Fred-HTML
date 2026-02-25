@@ -61,7 +61,7 @@
     .MiddleSection {
         display: flex;
         flex: 1 1 33.33%;
-        min-height: 0;
+        min-height: fit-content;
         justify-content: center;
         align-items: flex-start;
         gap: 20%;
@@ -128,15 +128,7 @@
         <fretboard-neck class="Fretboard" frets="15"></fretboard-neck>
     </div>
     <div data-layer="Middle Section" class="MiddleSection">
-        <chord-directory
-            title="Chord Directory"
-            tabs='["Root Pos", "Drop 2", "Drop 3", "Imposed", "Spread"]'
-            rows='[
-                {"root": "A",  "quality": "Major 7", "inversion": "Root",  "note-1": "1", "note-2": "3", "note-3": "5", "note-4": "7"},
-                {"root": "A",  "quality": "Major 7", "inversion": "1st",   "note-1": "3", "note-2": "5", "note-3": "7", "note-4": "1"},
-                {"root": "A",  "quality": "Major 7", "inversion": "2nd",   "note-1": "5", "note-2": "7", "note-3": "1", "note-4": "3"}
-            ]'>
-        </chord-directory>
+        <chord-directory></chord-directory>
 
     </div>
     <div data-layer="Bottom Section" class="BottomSection">

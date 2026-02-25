@@ -88,7 +88,14 @@ class NotesAndInversionsComponent extends HTMLElement {
     }
 
     _setupEventHandlers() {
-        // Add event listeners and interactive behavior
+        // Peek icon click → dispatch peek-click event on host element
+        const peekIcon = this.shadowRoot.querySelector('[data-action="peek"]');
+        if (peekIcon) {
+            peekIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.dispatchEvent(new CustomEvent('peek-click', { bubbles: true, composed: true }));
+            });
+        }
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
