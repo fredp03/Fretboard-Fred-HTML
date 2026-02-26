@@ -2,6 +2,7 @@
     <style>
         :host {
             display: inline-flex;
+            position: relative;
         }
 
         .ScaleSelectorWrapper {
@@ -87,6 +88,295 @@
         .EditInput.name-input {
             min-width: 80px;
         }
+
+        .KeyViewerOverlay[hidden] {
+            display: none !important;
+        }
+
+        .KeyViewerOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2500;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 72px 18px 18px;
+            background: rgba(28, 28, 28, 0.22);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .KeyViewerPanel {
+            width: min(880px, calc(100vw - 36px));
+            max-height: calc(100vh - 90px);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(98, 98, 98, 0.35);
+            background: rgba(58, 58, 58, 0.97);
+            box-shadow:
+                1px 1px 2px 0 rgba(90, 90, 90, 0.25),
+                -1px -1px 2px 0 rgba(22, 22, 22, 0.45),
+                -1px 1px 2px 0 rgba(22, 22, 22, 0.18) inset,
+                1px -1px 2px 0 rgba(22, 22, 22, 0.18) inset,
+                -1px -1px 2px 0 rgba(90, 90, 90, 0.55) inset,
+                1px 1px 3px 0 rgba(22, 22, 22, 0.75) inset;
+        }
+
+        .KeyViewerHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .KeyViewerTitle {
+            color: #b7b7b7;
+            font-family: 'Karla', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .KeyViewerCloseButton {
+            border: 1px solid rgba(99, 99, 99, 0.28);
+            background: #3f3f3f;
+            color: #a7a7a7;
+            height: 26px;
+            padding: 0 10px;
+            border-radius: 6px;
+            font-family: 'Karla', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.16s ease, color 0.16s ease;
+        }
+
+        .KeyViewerCloseButton:hover {
+            background: #e8e8e8;
+            color: #2a2a2a;
+        }
+
+        .KeyViewerControls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .ControlCluster {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .ControlCluster.filters {
+            flex: 1 1 420px;
+        }
+
+        .ControlLabel {
+            color: #949494;
+            font-family: 'Karla', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .KeyRootSelect {
+            height: 30px;
+            min-width: 110px;
+            padding: 0 28px 0 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(99, 99, 99, 0.28);
+            background: #3d3d3d url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center;
+            color: #b5b5b5;
+            font-family: Lekton, monospace;
+            font-size: 13px;
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .KeyRootSelect:focus {
+            border-color: rgba(205, 205, 205, 0.45);
+        }
+
+        .FilterButtonRow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .FilterButton {
+            border-radius: 10px;
+            border: 0.5px solid #606060;
+            height: 30px;
+            color: #A4A4A4;
+            background: #393939;
+            padding: 0 10px;
+            border-radius: 999px;
+            font-family: 'Karla', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+        }
+
+        .FilterButton.is-active {
+            border-radius: 10px;
+            border: 0.5px solid #8D8D8D;
+            background: #222;
+            box-shadow: -1px 1px 2px 0 rgba(23, 23, 23, 0.20), 1px -1px 2px 0 rgba(23, 23, 23, 0.20), 1px 1px 3px 0 rgba(23, 23, 23, 0.90);
+            color: #9A9A9A;
+        }
+
+        .KeyViewerHint {
+            color: #8f8f8f;
+            font-family: 'Karla', sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+        }
+
+        .ResultsFrame {
+            min-height: 220px;
+            flex: 1 1 auto;
+            border-radius: 10px;
+            border: 1px solid rgba(99, 99, 99, 0.22);
+            background: rgba(45, 45, 45, 0.82);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .KeyViewerResults {
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+            max-height: min(60vh, 560px);
+        }
+
+        .KeyViewerResult {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid rgba(85, 85, 85, 0.42);
+            background: transparent;
+            color: inherit;
+            text-align: left;
+            padding: 11px 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: background 0.14s ease;
+        }
+
+        .KeyViewerResult:last-child {
+            border-bottom: none;
+        }
+
+        .KeyViewerResult:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .KeyViewerResult.is-current {
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: inset 2px 0 0 rgba(232, 232, 232, 0.42);
+        }
+
+        .ResultTopRow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .ResultScaleInfo {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .ResultScaleRoot,
+        .ResultScaleName {
+            color: #a8a8a8;
+            font-family: Lekton, monospace;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .ResultScaleRoot {
+            color: #c3c3c3;
+        }
+
+        .ResultTensions {
+            color: #8f8f8f;
+            font-family: Lekton, monospace;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .ResultMetaRow {
+            min-width: 0;
+            color: #7e7e7e;
+            font-family: 'Karla', sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .ResultAliasTag {
+            color: #959595;
+            border: 1px solid rgba(99, 99, 99, 0.22);
+            border-radius: 999px;
+            padding: 2px 7px;
+            font-size: 10px;
+            line-height: 1;
+        }
+
+        .KeyViewerEmptyState {
+            padding: 16px 14px;
+            color: #848484;
+            font-family: 'Karla', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        @media (max-width: 720px) {
+            .KeyViewerOverlay {
+                padding: 56px 12px 12px;
+            }
+
+            .KeyViewerPanel {
+                width: calc(100vw - 24px);
+                max-height: calc(100vh - 68px);
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .ResultTopRow {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .ResultTensions {
+                white-space: normal;
+            }
+        }
     </style>
 
     <div class="ScaleSelectorWrapper">
@@ -95,6 +385,39 @@
         </div>
         <div class="ScaleName">
             <div class="NameText" data-bind="name">Harmonic Minor</div>
+        </div>
+    </div>
+
+    <div class="KeyViewerOverlay" data-key-viewer-overlay hidden aria-hidden="true">
+        <div class="KeyViewerPanel" data-key-viewer-panel role="dialog" aria-modal="true" aria-label="Key Viewer">
+            <div class="KeyViewerHeader">
+                <div class="KeyViewerTitle">Key Viewer</div>
+                <button type="button" class="KeyViewerCloseButton" data-action="close-key-viewer">Close</button>
+            </div>
+
+            <div class="KeyViewerControls">
+                <label class="ControlCluster">
+                    <span class="ControlLabel">Key Root Note</span>
+                    <select class="KeyRootSelect" data-key-root-select aria-label="Key Root Note"></select>
+                </label>
+
+                <div class="ControlCluster filters">
+                    <span class="ControlLabel">Filters</span>
+                    <div class="FilterButtonRow">
+                        <button type="button" class="FilterButton" data-family-filter="Major" aria-pressed="true">Major</button>
+                        <button type="button" class="FilterButton" data-family-filter="Natural Minor" aria-pressed="true">Natural Minor</button>
+                        <button type="button" class="FilterButton" data-family-filter="Harmonic Minor" aria-pressed="true">Harmonic Minor</button>
+                        <button type="button" class="FilterButton" data-family-filter="Melodic Minor" aria-pressed="true">Melodic Minor</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="KeyViewerHint"></div>
+
+            <div class="ResultsFrame">
+                <div class="KeyViewerResults" data-key-viewer-results></div>
+                <div class="KeyViewerEmptyState" data-key-viewer-empty hidden>Select a scale...</div>
+            </div>
         </div>
     </div>
 </template>

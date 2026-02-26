@@ -27,6 +27,23 @@
         .RowsContainer {
             padding: 2px 0;
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(0, 0, 0, 0.05));
+            max-height: 264px;
+            overflow-y: auto;
+            scrollbar-color: rgba(120, 120, 120, 0.4) transparent;
+            scrollbar-width: thin;
+        }
+        .RowsContainer::-webkit-scrollbar {
+            width: 6px;
+        }
+        .RowsContainer::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .RowsContainer::-webkit-scrollbar-thumb {
+            background: #1f1f1f;
+            border-radius: 999px;
+        }
+        .RowsContainer::-webkit-scrollbar-thumb:hover {
+            background: #202020;
         }
         .TabBar {
             display: flex;
