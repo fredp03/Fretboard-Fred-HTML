@@ -178,6 +178,13 @@
             flex: 1 1 420px;
         }
 
+        .ControlCluster.scale-search {
+            flex: 0 1 320px;
+            min-width: 220px;
+            margin-left: auto;
+            position: relative;
+        }
+
         .ControlLabel {
             color: #949494;
             font-family: 'Karla', sans-serif;
@@ -206,6 +213,100 @@
 
         .KeyRootSelect:focus {
             border-color: rgba(205, 205, 205, 0.45);
+        }
+
+        .SearchInputWrap {
+            position: relative;
+        }
+
+        .ScaleSearchInput {
+            height: 30px;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(99, 99, 99, 0.28);
+            background: #3d3d3d;
+            color: #b5b5b5;
+            font-family: 'Karla', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            outline: none;
+        }
+
+        .ScaleSearchInput::placeholder {
+            color: #7d7d7d;
+        }
+
+        .ScaleSearchInput:focus {
+            border-color: rgba(205, 205, 205, 0.45);
+        }
+
+        .ScaleSearchSuggestions[hidden] {
+            display: none !important;
+        }
+
+        .ScaleSearchSuggestions {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            max-height: 250px;
+            overflow: auto;
+            border-radius: 8px;
+            border: 1px solid rgba(99, 99, 99, 0.28);
+            background: rgba(46, 46, 46, 0.98);
+            box-shadow:
+                0 6px 18px rgba(0, 0, 0, 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.02);
+            z-index: 8;
+        }
+
+        .ScaleSearchSuggestion {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: inherit;
+            text-align: left;
+            padding: 8px 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            border-bottom: 1px solid rgba(85, 85, 85, 0.28);
+        }
+
+        .ScaleSearchSuggestion:last-child {
+            border-bottom: none;
+        }
+
+        .ScaleSearchSuggestion:hover,
+        .ScaleSearchSuggestion.is-active {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .ScaleSearchSuggestionLabel {
+            color: #b3b3b3;
+            font-family: Lekton, monospace;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+
+        .ScaleSearchSuggestionMeta {
+            color: #848484;
+            font-family: 'Karla', sans-serif;
+            font-size: 10px;
+            font-weight: 400;
+            line-height: 1.2;
+        }
+
+        .ScaleSearchEmpty {
+            padding: 10px;
+            color: #7f7f7f;
+            font-family: 'Karla', sans-serif;
+            font-size: 11px;
+            font-weight: 400;
         }
 
         .FilterButtonRow {
@@ -376,6 +477,12 @@
             .ResultTensions {
                 white-space: normal;
             }
+
+            .ControlCluster.scale-search {
+                flex: 1 1 100%;
+                min-width: 0;
+                margin-left: 0;
+            }
         }
     </style>
 
@@ -405,9 +512,25 @@
                     <span class="ControlLabel">Filters</span>
                     <div class="FilterButtonRow">
                         <button type="button" class="FilterButton" data-family-filter="Major" aria-pressed="true">Major</button>
-                        <button type="button" class="FilterButton" data-family-filter="Natural Minor" aria-pressed="true">Natural Minor</button>
                         <button type="button" class="FilterButton" data-family-filter="Harmonic Minor" aria-pressed="true">Harmonic Minor</button>
                         <button type="button" class="FilterButton" data-family-filter="Melodic Minor" aria-pressed="true">Melodic Minor</button>
+                    </div>
+                </div>
+
+                <div class="ControlCluster scale-search">
+                    <span class="ControlLabel">Find Scale</span>
+                    <div class="SearchInputWrap">
+                        <input
+                            type="text"
+                            class="ScaleSearchInput"
+                            data-scale-search-input
+                            aria-label="Search scales"
+                            autocomplete="off"
+                            autocapitalize="off"
+                            autocorrect="off"
+                            spellcheck="false"
+                            placeholder="Type a scale (e.g. G Lydian Dominant)">
+                        <div class="ScaleSearchSuggestions" data-scale-search-suggestions hidden role="listbox" aria-label="Scale suggestions"></div>
                     </div>
                 </div>
             </div>

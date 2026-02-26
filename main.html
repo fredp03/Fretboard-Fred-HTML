@@ -50,7 +50,7 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        background-color: #383838;
+        background-color: #313030;
     }
 
     .FretboardSection {
@@ -140,6 +140,11 @@
     .ScaleSelectorWrapper {
         height: 100%;
     }
+    .ChordDirectory{
+        border-radius: 13px;
+        background: #262626;
+        box-shadow: 0 2px 4.1px 0 rgba(0, 0, 0, 0.81);
+    }
 </style>
 
 <body>
@@ -160,7 +165,7 @@
     <div data-layer="Middle Section" class="MiddleSection">
 
         <div data-layer="Middle Left" class="MiddleLeftSection">
-            <chord-directory></chord-directory>
+            <chord-directory class="ChordDirectory"></chord-directory>
         </div>
 
         <div data-layer="Middle Right" class="MiddleRightSection">

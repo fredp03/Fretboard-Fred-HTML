@@ -102,6 +102,9 @@ class ScaleSelectorComponent extends HTMLElement {
             acc[family.id] = true;
             return acc;
         }, {});
+        this._scaleSearchQuery = '';
+        this._scaleSearchMatches = [];
+        this._scaleSearchActiveIndex = -1;
     }
 
     static get observedAttributes() {
@@ -234,6 +237,8 @@ class ScaleSelectorComponent extends HTMLElement {
         this._resultsEl = this.shadowRoot.querySelector('[data-key-viewer-results]');
         this._emptyStateEl = this.shadowRoot.querySelector('[data-key-viewer-empty]');
         this._filterButtons = [...this.shadowRoot.querySelectorAll('[data-family-filter]')];
+        this._scaleSearchInputEl = this.shadowRoot.querySelector('[data-scale-search-input]');
+        this._scaleSearchSuggestionsEl = this.shadowRoot.querySelector('[data-scale-search-suggestions]');
     }
 
     _restorePersistedState() {
@@ -305,8 +310,54 @@ class ScaleSelectorComponent extends HTMLElement {
                 this._keyViewerFilters[familyId] = !this._keyViewerFilters[familyId];
                 this._syncFilterButtons();
                 this._renderKeyViewerResults();
+                this._renderScaleSearchSuggestions();
             });
         });
+
+        if (this._scaleSearchInputEl) {
+            this._scaleSearchInputEl.addEventListener('input', (e) => {
+                this._scaleSearchQuery = e.target.value || '';
+                this._scaleSearchActiveIndex = -1;
+                this._renderScaleSearchSuggestions();
+            });
+
+            this._scaleSearchInputEl.addEventListener('focus', () => {
+                this._renderScaleSearchSuggestions();
+            });
+
+            this._scaleSearchInputEl.addEventListener('keydown', (e) => {
+                this._handleScaleSearchKeydown(e);
+            });
+
+            this._scaleSearchInputEl.addEventListener('blur', () => {
+                requestAnimationFrame(() => {
+                    const activeEl = this.shadowRoot.activeElement;
+                    if (!activeEl || !this._scaleSearchSuggestionsEl?.contains(activeEl)) {
+                        this._hideScaleSearchSuggestions();
+                    }
+                });
+            });
+        }
+
+        if (this._scaleSearchSuggestionsEl) {
+            this._scaleSearchSuggestionsEl.addEventListener('mousedown', (e) => {
+                const option = e.target.closest('.ScaleSearchSuggestion');
+                if (option) {
+                    e.preventDefault();
+                }
+            });
+
+            this._scaleSearchSuggestionsEl.addEventListener('click', (e) => {
+                const option = e.target.closest('.ScaleSearchSuggestion');
+                if (!option) return;
+
+                const root = option.getAttribute('data-scale-root');
+                const name = option.getAttribute('data-scale-name');
+                if (!root || !name) return;
+
+                this._applyScaleSearchSelection(root, name);
+            });
+        }
 
         if (this._resultsEl) {
             this._resultsEl.addEventListener('click', (e) => {
@@ -369,6 +420,7 @@ class ScaleSelectorComponent extends HTMLElement {
         this._lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
         this._keyViewerOpen = true;
         this._keyViewerRoot = null;
+        this._resetScaleSearch();
 
         this._syncKeyViewerUi();
         this._overlayEl.hidden = false;
@@ -389,6 +441,7 @@ class ScaleSelectorComponent extends HTMLElement {
         this._overlayEl.hidden = true;
         this._overlayEl.setAttribute('aria-hidden', 'true');
         this.removeAttribute('key-viewer-open');
+        this._resetScaleSearch();
 
         if (this._lastFocusedElement && this._lastFocusedElement.isConnected) {
             this._lastFocusedElement.focus({ preventScroll: true });
@@ -429,6 +482,7 @@ class ScaleSelectorComponent extends HTMLElement {
 
         this._syncFilterButtons();
         this._renderKeyViewerResults();
+        this._renderScaleSearchSuggestions();
     }
 
     _syncFilterButtons() {
@@ -438,6 +492,242 @@ class ScaleSelectorComponent extends HTMLElement {
             button.classList.toggle('is-active', active);
             button.setAttribute('aria-pressed', active ? 'true' : 'false');
         });
+    }
+
+    _normalizeSearchText(value) {
+        return String(value || '')
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, ' ');
+    }
+
+    _hideScaleSearchSuggestions() {
+        if (!this._scaleSearchSuggestionsEl) return;
+        this._scaleSearchSuggestionsEl.hidden = true;
+        if (this._scaleSearchInputEl) {
+            this._scaleSearchInputEl.setAttribute('aria-expanded', 'false');
+        }
+    }
+
+    _showScaleSearchSuggestions() {
+        if (!this._scaleSearchSuggestionsEl) return;
+        this._scaleSearchSuggestionsEl.hidden = false;
+        if (this._scaleSearchInputEl) {
+            this._scaleSearchInputEl.setAttribute('aria-expanded', 'true');
+        }
+    }
+
+    _resetScaleSearch() {
+        this._scaleSearchQuery = '';
+        this._scaleSearchMatches = [];
+        this._scaleSearchActiveIndex = -1;
+
+        if (this._scaleSearchInputEl) {
+            this._scaleSearchInputEl.value = '';
+            this._scaleSearchInputEl.setAttribute('aria-expanded', 'false');
+        }
+
+        if (this._scaleSearchSuggestionsEl) {
+            this._scaleSearchSuggestionsEl.innerHTML = '';
+            this._scaleSearchSuggestionsEl.hidden = true;
+        }
+    }
+
+    _getActiveKeyViewerFamilyIds() {
+        return new Set(
+            ScaleSelectorComponent.FAMILY_DEFS
+                .map((family) => family.id)
+                .filter((familyId) => this._keyViewerFilters[familyId])
+        );
+    }
+
+    _buildScaleSearchMatches(query) {
+        const normalizedQuery = this._normalizeSearchText(query);
+        if (!normalizedQuery) return [];
+
+        const activeFamilies = this._getActiveKeyViewerFamilyIds();
+        const catalog = ScaleSelectorComponent._buildKeyViewerCatalog();
+        const matches = [];
+
+        ScaleSelectorComponent.CHROMATIC.forEach((root) => {
+            catalog.forEach((entry) => {
+                if (!activeFamilies.has(entry.familyId)) return;
+
+                const label = `${root} ${entry.name}`;
+                const normalizedLabel = this._normalizeSearchText(label);
+                const normalizedName = this._normalizeSearchText(entry.name);
+
+                let matchRank = -1;
+                if (normalizedLabel === normalizedQuery) {
+                    matchRank = 0;
+                } else if (normalizedLabel.startsWith(normalizedQuery)) {
+                    matchRank = 1;
+                } else if (normalizedName.startsWith(normalizedQuery)) {
+                    matchRank = 2;
+                } else if (normalizedLabel.includes(normalizedQuery)) {
+                    matchRank = 3;
+                }
+
+                if (matchRank < 0) return;
+
+                matches.push({
+                    matchRank,
+                    root,
+                    name: entry.name,
+                    label,
+                    parentScale: entry.parentScale,
+                    parentRoot: this._computeParentRoot(root, entry.parentOffset),
+                    modeIndex: entry.modeIndex,
+                    isAlias: entry.isAlias,
+                    aliasOf: entry.aliasOf
+                });
+            });
+        });
+
+        matches.sort((a, b) => {
+            if (a.matchRank !== b.matchRank) return a.matchRank - b.matchRank;
+            if (a.label.length !== b.label.length) return a.label.length - b.label.length;
+            return a.label.localeCompare(b.label);
+        });
+
+        return matches.slice(0, 16);
+    }
+
+    _renderScaleSearchSuggestions() {
+        if (!this._scaleSearchSuggestionsEl || !this._scaleSearchInputEl) return;
+
+        const query = this._scaleSearchInputEl.value || this._scaleSearchQuery || '';
+        this._scaleSearchQuery = query;
+
+        if (!this._keyViewerOpen || !this._normalizeSearchText(query)) {
+            this._scaleSearchMatches = [];
+            this._scaleSearchActiveIndex = -1;
+            this._hideScaleSearchSuggestions();
+            return;
+        }
+
+        this._scaleSearchMatches = this._buildScaleSearchMatches(query);
+        if (!this._scaleSearchMatches.length) {
+            this._scaleSearchActiveIndex = -1;
+        } else if (this._scaleSearchActiveIndex >= this._scaleSearchMatches.length) {
+            this._scaleSearchActiveIndex = this._scaleSearchMatches.length - 1;
+        }
+
+        this._scaleSearchSuggestionsEl.innerHTML = '';
+
+        if (!this._scaleSearchMatches.length) {
+            const empty = document.createElement('div');
+            empty.className = 'ScaleSearchEmpty';
+            empty.textContent = 'No matching scales';
+            this._scaleSearchSuggestionsEl.appendChild(empty);
+            this._showScaleSearchSuggestions();
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        this._scaleSearchMatches.forEach((match, idx) => {
+            const option = document.createElement('button');
+            option.type = 'button';
+            option.className = 'ScaleSearchSuggestion';
+            if (idx === this._scaleSearchActiveIndex) {
+                option.classList.add('is-active');
+            }
+
+            option.setAttribute('data-scale-root', match.root);
+            option.setAttribute('data-scale-name', match.name);
+            option.setAttribute('role', 'option');
+            option.setAttribute('aria-selected', idx === this._scaleSearchActiveIndex ? 'true' : 'false');
+
+            const labelEl = document.createElement('div');
+            labelEl.className = 'ScaleSearchSuggestionLabel';
+            labelEl.textContent = match.label;
+
+            const modeLabel = match.modeIndex > 1 ? `Mode ${match.modeIndex}` : 'Root';
+            let metaText = `${match.parentRoot} ${match.parentScale} · ${modeLabel}`;
+            if (match.isAlias && match.aliasOf) {
+                metaText += ` · Alias of ${match.aliasOf}`;
+            }
+
+            const metaEl = document.createElement('div');
+            metaEl.className = 'ScaleSearchSuggestionMeta';
+            metaEl.textContent = metaText;
+
+            option.appendChild(labelEl);
+            option.appendChild(metaEl);
+            fragment.appendChild(option);
+        });
+
+        this._scaleSearchSuggestionsEl.appendChild(fragment);
+        this._showScaleSearchSuggestions();
+    }
+
+    _handleScaleSearchKeydown(e) {
+        const hasMatches = this._scaleSearchMatches.length > 0;
+
+        if (e.key === 'ArrowDown') {
+            if (!hasMatches) {
+                this._renderScaleSearchSuggestions();
+                return;
+            }
+
+            e.preventDefault();
+            this._scaleSearchActiveIndex = (this._scaleSearchActiveIndex + 1 + this._scaleSearchMatches.length) % this._scaleSearchMatches.length;
+            this._renderScaleSearchSuggestions();
+            this._scrollActiveScaleSearchSuggestionIntoView();
+            return;
+        }
+
+        if (e.key === 'ArrowUp') {
+            if (!hasMatches) {
+                this._renderScaleSearchSuggestions();
+                return;
+            }
+
+            e.preventDefault();
+            this._scaleSearchActiveIndex = this._scaleSearchActiveIndex <= 0
+                ? this._scaleSearchMatches.length - 1
+                : this._scaleSearchActiveIndex - 1;
+            this._renderScaleSearchSuggestions();
+            this._scrollActiveScaleSearchSuggestionIntoView();
+            return;
+        }
+
+        if (e.key === 'Enter') {
+            if (!hasMatches) return;
+            e.preventDefault();
+
+            const targetIndex = this._scaleSearchActiveIndex >= 0 ? this._scaleSearchActiveIndex : 0;
+            const match = this._scaleSearchMatches[targetIndex];
+            if (match) {
+                this._applyScaleSearchSelection(match.root, match.name);
+            }
+            return;
+        }
+
+        if (e.key === 'Escape') {
+            if (this._scaleSearchInputEl?.value) {
+                e.preventDefault();
+                this._resetScaleSearch();
+            } else {
+                this._hideScaleSearchSuggestions();
+            }
+        }
+    }
+
+    _scrollActiveScaleSearchSuggestionIntoView() {
+        if (!this._scaleSearchSuggestionsEl || this._scaleSearchActiveIndex < 0) return;
+        const options = this._scaleSearchSuggestionsEl.querySelectorAll('.ScaleSearchSuggestion');
+        const activeOption = options[this._scaleSearchActiveIndex];
+        if (activeOption) {
+            activeOption.scrollIntoView({ block: 'nearest' });
+        }
+    }
+
+    _applyScaleSearchSelection(root, name) {
+        this._keyViewerRoot = this._normalizeToViewerRoot(root);
+        this._applyScaleSelection(root, name);
+        this._closeKeyViewer();
     }
 
     _computeParentRoot(resultRoot, parentOffset) {
