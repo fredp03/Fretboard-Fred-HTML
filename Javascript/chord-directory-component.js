@@ -217,10 +217,10 @@ class ChordDirectoryComponent extends HTMLElement {
 
         // Note selection on fretboard — track all selected notes
         this._noteHandler = (e) => {
-            const { id, note, stringName, active } = e.detail;
+            const { id, note, stringName, active, pinned } = e.detail;
             if (active) {
                 const fret = parseInt(id.slice(id.lastIndexOf('-') + 1), 10);
-                this._selectedNotes.set(id, { id, note, stringName, fret });
+                this._selectedNotes.set(id, { id, note, stringName, fret, pinned: pinned || null });
             } else {
                 this._selectedNotes.delete(id);
             }
@@ -258,6 +258,7 @@ class ChordDirectoryComponent extends HTMLElement {
             stringNumber: ChordDirectoryComponent.STRING_NAME_TO_NUM[n.stringName],
             stringName: n.stringName,
             fret: n.fret,
+            pinned: n.pinned || null,
         })).filter(n => n.stringNumber);
 
         if (selected.length === 0) {
@@ -293,6 +294,30 @@ class ChordDirectoryComponent extends HTMLElement {
             rootPosTensions = rootPosTensions.filter(voicingContainsAll);
             drop2Tensions   = drop2Tensions.filter(voicingContainsAll);
             drop3Tensions   = drop3Tensions.filter(voicingContainsAll);
+        }
+
+        // ── Cmd-click pin filter: bass / soprano constraint ──
+        const S2N = ChordDirectoryComponent.STRING_NAME_TO_NUM;
+        const pinnedNotes = selected.filter(s => s.pinned);
+        if (pinnedNotes.length > 0) {
+            const pinFilter = (result) => {
+                // Determine the highest and lowest string numbers in this voicing
+                const voicingStrNums = Object.keys(result.voicingMap).map(n => S2N[n]).filter(Boolean);
+                const lowestStringNum  = Math.max(...voicingStrNums); // highest number = lowest pitch
+                const highestStringNum = Math.min(...voicingStrNums); // lowest number  = highest pitch
+                return pinnedNotes.every(pin => {
+                    const pinStrNum = S2N[pin.stringName];
+                    if (pin.pinned === 'bass')    return pinStrNum === lowestStringNum;
+                    if (pin.pinned === 'soprano') return pinStrNum === highestStringNum;
+                    return true;
+                });
+            };
+            rootPos         = rootPos.filter(pinFilter);
+            drop2           = drop2.filter(pinFilter);
+            drop3           = drop3.filter(pinFilter);
+            rootPosTensions = rootPosTensions.filter(pinFilter);
+            drop2Tensions   = drop2Tensions.filter(pinFilter);
+            drop3Tensions   = drop3Tensions.filter(pinFilter);
         }
 
         // Merge base voicings with tension voicings (tensions appended after base)
@@ -394,7 +419,7 @@ class ChordDirectoryComponent extends HTMLElement {
         // Absolute pitch classes of the scale
         const scalePcs = scaleSteps.map(s => mod12(rootPc + s));
 
-        return scalePcs.map((chordRootPc, i) => {
+        const chords = scalePcs.map((chordRootPc, i) => {
             // Intervals from chord root to 3rd, 5th, 7th (stacking 3rds)
             const thirdPc  = scalePcs[(i + 2) % 7];
             const fifthPc  = scalePcs[(i + 4) % 7];
@@ -415,6 +440,34 @@ class ChordDirectoryComponent extends HTMLElement {
                 formula,
             };
         });
+
+        // ── 6th chord equivalences ─────────────────────────────────────
+        // Am7 (A-C-E-G) = C6 (C-E-G-A)  →  every m7 produces a Maj 6
+        // Bm7b5 (B-D-F-A) = Dm6 (D-F-A-B)  →  every m7b5 produces a Min 6
+        const sixthChords = [];
+        for (const chord of chords) {
+            if (chord.quality === 'm7') {
+                const sixthRootPc = mod12(chord.rootPc + chord.formula[1]); // b3
+                sixthChords.push({
+                    degree: chord.degree,
+                    rootPc: sixthRootPc,
+                    root: ChordDirectoryComponent._pcToName(sixthRootPc),
+                    quality: '6',
+                    formula: [0, 4, 7, 9],
+                });
+            } else if (chord.quality === 'm7b5') {
+                const sixthRootPc = mod12(chord.rootPc + chord.formula[1]); // b3
+                sixthChords.push({
+                    degree: chord.degree,
+                    rootPc: sixthRootPc,
+                    root: ChordDirectoryComponent._pcToName(sixthRootPc),
+                    quality: 'm6',
+                    formula: [0, 3, 7, 9],
+                });
+            }
+        }
+
+        return [...chords, ...sixthChords];
     }
 
     static _fretsForPitchClass(stringNumber, targetPc, maxFret = 24) {
@@ -445,12 +498,13 @@ class ChordDirectoryComponent extends HTMLElement {
         return 'custom';
     }
 
-    // Build voicing map compatible with triad-preview system { 'string-name': { note, fret } }
-    static _buildVoicingMap(stringSet, frets, noteNames) {
+    // Build voicing map compatible with triad-preview system { 'string-name': { note, fret, chordDegree? } }
+    static _buildVoicingMap(stringSet, frets, noteNames, degrees) {
         const map = {};
         for (let i = 0; i < stringSet.length; i++) {
             const name = ChordDirectoryComponent.STRING_NUM_TO_NAME[stringSet[i]];
             map[name] = { note: noteNames[i], fret: frets[i] };
+            if (degrees) map[name].chordDegree = degrees[i];
         }
         return map;
     }
@@ -497,7 +551,38 @@ class ChordDirectoryComponent extends HTMLElement {
             default:        return quality;
         }
     }
-
+    /**
+     * Like _qualityDisplayName but replaces the "7" with the tension number,
+     * producing conventional extended-chord names (e.g. Min 9, Dom 13).
+     */
+    static _tensionQualityDisplayName(quality, tension) {
+        const base = {
+            'maj7':    { prefix: 'Maj',      suffix: '' },
+            'm7':      { prefix: 'Min',      suffix: '' },
+            '7':       { prefix: 'Dom',      suffix: '' },
+            'm7b5':    { prefix: 'Min',      suffix: '(b5)' },
+            'dim7':    { prefix: 'Dim',      suffix: '' },
+            'mMaj7':   { prefix: 'Min/Maj',  suffix: '' },
+            'augMaj7': { prefix: 'Aug/Maj',  suffix: '' },
+            'aug7':    { prefix: 'Aug',      suffix: '' },
+            'maj7b5':  { prefix: 'Maj',      suffix: '(b5)' },
+            '7b5':     { prefix: 'Dom',      suffix: '(b5)' },
+            '7sus4':   { prefix: 'Dom',      suffix: 'sus4' },
+            'm7s5':    { prefix: 'Min',      suffix: '(#5)' },
+            '6':       { prefix: 'Maj 6/',   suffix: '' },
+            '6b5':     { prefix: 'Maj 6(b5)/', suffix: '' },
+            'm6':      { prefix: 'Min 6/',   suffix: '' },
+        };
+        const entry = base[quality];
+        if (!entry) return `${quality} (${tension})`;
+        // For 6-type chords use slash notation: "Maj 6/9"
+        if (quality === '6' || quality === '6b5' || quality === 'm6') {
+            return `${entry.prefix}${tension}`;
+        }
+        return entry.suffix
+            ? `${entry.prefix} ${tension}${entry.suffix}`
+            : `${entry.prefix} ${tension}`;
+    }
     static _degreeLabels(quality, noteOrder) {
         // Shared tension labels appended to every quality map
         const tensionLabels = { 9: '9', 11: '11', 13: '13' };
@@ -636,7 +721,7 @@ class ChordDirectoryComponent extends HTMLElement {
                     displayQuality: ChordDirectoryComponent._qualityDisplayName(chord.quality),
                     displayInversion: 'Root',
                     degrees,
-                    voicingMap: ChordDirectoryComponent._buildVoicingMap(stringSet, frets, noteNames),
+                    voicingMap: ChordDirectoryComponent._buildVoicingMap(stringSet, frets, noteNames, degrees),
                     stringGroup: ChordDirectoryComponent._stringSetLabel(stringSet),
                     frets,
                     hasB9Interval: ChordDirectoryComponent._hasB9Interval(midis),
@@ -695,7 +780,7 @@ class ChordDirectoryComponent extends HTMLElement {
                         displayQuality: ChordDirectoryComponent._qualityDisplayName(chord.quality),
                         displayInversion: `${invName}`,
                         degrees,
-                        voicingMap: ChordDirectoryComponent._buildVoicingMap(stringSet, frets, noteNames),
+                        voicingMap: ChordDirectoryComponent._buildVoicingMap(stringSet, frets, noteNames, degrees),
                         stringGroup: ChordDirectoryComponent._stringSetLabel(stringSet),
                         frets,
                         hasB9Interval: ChordDirectoryComponent._hasB9Interval(midis),
@@ -755,7 +840,7 @@ class ChordDirectoryComponent extends HTMLElement {
                         displayQuality: ChordDirectoryComponent._qualityDisplayName(chord.quality),
                         displayInversion: `${invName}`,
                         degrees,
-                        voicingMap: ChordDirectoryComponent._buildVoicingMap(stringSet, frets, noteNames),
+                        voicingMap: ChordDirectoryComponent._buildVoicingMap(stringSet, frets, noteNames, degrees),
                         stringGroup: ChordDirectoryComponent._stringSetLabel(stringSet),
                         frets,
                         hasB9Interval: ChordDirectoryComponent._hasB9Interval(midis),
@@ -923,10 +1008,10 @@ class ChordDirectoryComponent extends HTMLElement {
 
                         results.push({
                             displayRoot: chord.root,
-                            displayQuality: ChordDirectoryComponent._qualityDisplayName(chord.quality),
+                            displayQuality: ChordDirectoryComponent._tensionQualityDisplayName(chord.quality, sub.tension),
                             displayInversion: invName,
                             degrees,
-                            voicingMap: ChordDirectoryComponent._buildVoicingMap(stringSet, frets, noteNames),
+                            voicingMap: ChordDirectoryComponent._buildVoicingMap(stringSet, frets, noteNames, degrees),
                             stringGroup: ChordDirectoryComponent._stringSetLabel(stringSet),
                             frets,
                             hasB9Interval: ChordDirectoryComponent._hasB9Interval(midis),

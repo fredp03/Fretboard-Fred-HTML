@@ -49,6 +49,13 @@
             filter: hue-rotate(210deg) saturate(1.2) brightness(1.1);
         }
 
+        /* Pinned note indicator — subtle outline ring */
+        :host([pinned]) .NoteMarker {
+            outline: 2px solid rgba(255, 200, 80, 0.7);
+            outline-offset: 2px;
+            border-radius: 50%;
+        }
+
         /* In-scale notes - green tint only, no drop-shadow in filter */
         :host([in-scale]) .NoteMarker {
             filter: hue-rotate(85deg) saturate(0.8);

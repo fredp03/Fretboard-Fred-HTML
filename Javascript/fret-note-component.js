@@ -95,6 +95,7 @@ class FretNoteComponent extends HTMLElement {
     static _lastPeekKeydownTime = 0;
     static scalePeekListenersAttached = false;
     static triadListenersAttached = false;
+    static chordDegreeMode = false;
 
     static _setScalePeekActive(active) {
         FretNoteComponent.scalePeekActive = active;
@@ -108,6 +109,13 @@ class FretNoteComponent extends HTMLElement {
             if (note._applyScalePeekState) {
                 note._applyScalePeekState();
             }
+        });
+    }
+
+    static _toggleChordDegreeMode() {
+        FretNoteComponent.chordDegreeMode = !FretNoteComponent.chordDegreeMode;
+        FretNoteComponent.instances.forEach((note) => {
+            note._updateNoteDisplay();
         });
     }
 
@@ -216,6 +224,13 @@ class FretNoteComponent extends HTMLElement {
                 const inVoicing = !!(entry && parseInt(entry.fret) === fret);
                 const isActive = note.hasAttribute('active');
 
+                // Store / clear chord degree from voicing map
+                if (inVoicing && entry.chordDegree) {
+                    note._chordDegree = entry.chordDegree;
+                } else if (!inVoicing) {
+                    note._chordDegree = null;
+                }
+
                 const dispatch = (active) => {
                     const noteName = note._getNoteForPosition(str, String(fret));
                     const degree = note._getScaleDegree(noteName);
@@ -228,6 +243,8 @@ class FretNoteComponent extends HTMLElement {
                     // Shift-click on fully-active triad: deactivate its notes only.
                     if (inVoicing && isActive) {
                         note.removeAttribute('active');
+                        note.removeAttribute('pinned');
+                        note._chordDegree = null;
                         dispatch(false);
                     }
                 } else if (additive) {
@@ -243,8 +260,15 @@ class FretNoteComponent extends HTMLElement {
                         dispatch(true);
                     } else if (!inVoicing && isActive) {
                         note.removeAttribute('active');
+                        note.removeAttribute('pinned');
+                        note._chordDegree = null;
                         dispatch(false);
                     }
+                }
+
+                // Refresh text when chord-degree mode is active so the label updates
+                if (FretNoteComponent.chordDegreeMode) {
+                    note._updateNoteDisplay();
                 }
             });
         });
@@ -304,7 +328,7 @@ class FretNoteComponent extends HTMLElement {
     _setupClickHandler() {
         const noteMarker = this.shadowRoot.querySelector('.NoteMarker');
         if (noteMarker) {
-            noteMarker.addEventListener('click', () => {
+            noteMarker.addEventListener('click', (e) => {
                 this.toggleAttribute('active');
 
                 // If activating while peek is on, the note is already visible at 0.4
@@ -326,8 +350,19 @@ class FretNoteComponent extends HTMLElement {
                 const degree = this._getScaleDegree(note);
                 const isActive = this.hasAttribute('active');
 
+                // Cmd-click (Meta on Mac) pins the note as bass or soprano.
+                // Strings 6/5/4 (low-e, a, d) → bass; strings 3/2/1 (g, b, high-e) → soprano.
+                let pinned = null;
+                if (isActive && (e.metaKey || e.ctrlKey)) {
+                    const lowStrings = ['low-e', 'a', 'd'];
+                    pinned = lowStrings.includes(stringName) ? 'bass' : 'soprano';
+                    this.setAttribute('pinned', pinned);
+                } else {
+                    this.removeAttribute('pinned');
+                }
+
                 document.dispatchEvent(new CustomEvent('note-selection-changed', {
-                    detail: { id: `${stringName}-${fretNumber}`, note, degree, stringName, active: isActive }
+                    detail: { id: `${stringName}-${fretNumber}`, note, degree, stringName, active: isActive, pinned }
                 }));
             });
         }
@@ -413,8 +448,13 @@ class FretNoteComponent extends HTMLElement {
         const noteTextEl = this.shadowRoot.querySelector('.NoteText');
         if (noteTextEl) {
             if (displayMode === 'degree') {
-                const degree = this._getScaleDegree(note);
-                noteTextEl.textContent = degree;
+                // In chord-degree mode, show the stored chord degree if available
+                if (FretNoteComponent.chordDegreeMode && this._chordDegree) {
+                    noteTextEl.textContent = this._chordDegree;
+                } else {
+                    const degree = this._getScaleDegree(note);
+                    noteTextEl.textContent = degree;
+                }
             } else {
                 noteTextEl.textContent = note;
             }

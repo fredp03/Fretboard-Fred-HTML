@@ -254,10 +254,16 @@ class ToggleComponent extends HTMLElement {
                 if (toggle && typeof toggle._toggle === 'function') toggle._toggle();
             }
 
+            // S key: toggle between scale degrees and chord degrees
+            if (e.code === 'KeyS' || e.key === 's' || e.key === 'S') {
+                FretNoteComponent._toggleChordDegreeMode();
+            }
+
             if (e.code === 'KeyC' || e.key === 'c' || e.key === 'C') {
                 FretNoteComponent.instances.forEach((note) => {
                     if (note.hasAttribute('active')) {
                         note.removeAttribute('active');
+                        note.removeAttribute('pinned');
                         const str = note.getAttribute('string-name');
                         const fret = note.getAttribute('fret-number');
                         const noteName = note._getNoteForPosition(str, fret);
