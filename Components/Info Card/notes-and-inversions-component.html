@@ -54,6 +54,31 @@
             opacity: 1;
         }
 
+        /* b9 interval warning — muted row with caution border */
+        .NotesAndInversionsWrapper.b9-warning {
+            border-left: 2px solid #c47a2a;
+            opacity: 0.55;
+        }
+        .NotesAndInversionsWrapper.b9-warning:hover {
+            opacity: 0.8;
+        }
+
+        /* Tension substitution badge */
+        .TensionBadge {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: rgba(100, 160, 255, 0.15);
+            color: #7aafff;
+            font-family: Lekton;
+            font-size: 10px;
+            font-weight: 400;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
     </style>
 
     <div class="NotesAndInversionsWrapper">
@@ -79,6 +104,7 @@
             <div class="ItemText" data-note="note-4">7</div>  
         </div>
 
+    <span class="TensionBadge"></span>
     <img class="icon" data-action="peek" src="../../Assets/PeakIcon.svg" alt="peak icon">
 
     </div>

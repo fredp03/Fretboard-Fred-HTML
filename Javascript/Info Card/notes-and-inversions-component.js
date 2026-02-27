@@ -10,7 +10,7 @@ class NotesAndInversionsComponent extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ['title', 'root', 'quality', 'note-1', 'note-2', 'note-3', 'note-4', 'inversion'];
+        return ['title', 'root', 'quality', 'note-1', 'note-2', 'note-3', 'note-4', 'inversion', 'b9-warning', 'tension'];
     }
 
     async connectedCallback() {
@@ -57,6 +57,17 @@ class NotesAndInversionsComponent extends HTMLElement {
             const val = this.getAttribute(attr);
             if (val !== null) this._updateNote(attr, val);
         });
+
+        // b9 interval warning
+        if (this.hasAttribute('b9-warning')) {
+            this._applyB9Warning(true);
+        }
+
+        // Tension substitution badge
+        const tension = this.getAttribute('tension');
+        if (tension) {
+            this._applyTensionBadge(tension);
+        }
     }
 
     _updateBinding(bindName, value) {
@@ -84,6 +95,24 @@ class NotesAndInversionsComponent extends HTMLElement {
         const el = this.shadowRoot.querySelector(`[data-inversion="${inversionName}"]`);
         if (el) {
             el.textContent = value;
+        }
+    }
+
+    _applyB9Warning(active) {
+        const wrapper = this.shadowRoot.querySelector('.NotesAndInversionsWrapper');
+        if (!wrapper) return;
+        if (active) {
+            wrapper.classList.add('b9-warning');
+        } else {
+            wrapper.classList.remove('b9-warning');
+        }
+    }
+
+    _applyTensionBadge(label) {
+        const badge = this.shadowRoot.querySelector('.TensionBadge');
+        if (badge) {
+            badge.textContent = label || '';
+            badge.style.display = label ? 'inline-flex' : 'none';
         }
     }
 
@@ -119,6 +148,12 @@ class NotesAndInversionsComponent extends HTMLElement {
                 break;
             case 'inversion':
                 this._updateInversion('inversion', newValue);
+                break;
+            case 'b9-warning':
+                this._applyB9Warning(newValue !== null);
+                break;
+            case 'tension':
+                this._applyTensionBadge(newValue);
                 break;
         }
     }
