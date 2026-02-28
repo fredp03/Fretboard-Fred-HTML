@@ -1,0 +1,227 @@
+<style>
+  /* --- Outer Container --- */
+  .ChordPicker {
+    width: 802px;
+    height: 450px;
+    background: #393636;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* --- Title Bar --- */
+  .ChordPickerTitle {
+    padding: 10px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 35px;
+  }
+
+  .ChordPickerTitle .ChordPicker {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #B2B2B2;
+    font-size: 16px;
+    font-family: Karla;
+    font-weight: 600;
+    word-wrap: break-word;
+  }
+
+  /* --- Tabs --- */
+  .ChordPickerTabs {
+    align-self: stretch;
+    padding: 28px 20px;
+    overflow: hidden;
+    border-radius: 4px;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .Tab1,
+  .Tab2,
+  .Tab3 {
+    align-self: stretch;
+    padding: 9px 20px;
+    border-radius: 10px;
+    outline-offset: -1px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .Tab1 {
+    outline: 1px #A1A1A1 solid;
+  }
+
+  .Tab2,
+  .Tab3 {
+    outline: 1px #434343 solid;
+  }
+
+  .ChordPickerTabs .Label1,
+  .ChordPickerTabs .Label2,
+  .ChordPickerTabs .Label3 {
+    text-align: center;
+    color: #B6B6B6;
+    font-size: 14px;
+    font-family: Karla;
+    font-weight: 400;
+    text-transform: capitalize;
+    line-height: 16px;
+    word-wrap: break-word;
+  }
+
+  /* --- Table Rows --- */
+  .ChordPickerTableRows {
+    align-self: stretch;
+    flex: 1 1 0;
+    padding: 10px;
+    background: #2F2F2F;
+    box-shadow:
+      -6px 6px 15px rgba(19, 19, 19, 0.90),
+      6px -6px 12px rgba(75, 75, 75, 0.90),
+      -6px -6px 12px rgba(19, 19, 19, 0.20),
+      6px 6px 12px rgba(19, 19, 19, 0.20);
+    border-radius: 10px;
+    outline: 1px #DFDFDF solid;
+    outline-offset: -1px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .AvailableChordRow1,
+  .AvailableChordRow2,
+  .AvailableChordRow4,
+  .AvailableChordRow5,
+  .AvailableChordRow6,
+  .AvailableChordRow7 {
+    align-self: stretch;
+    flex: 1 1 0;
+    padding: 15px 20px;
+    border-bottom: 0.5px rgba(0, 0, 0, 0.21) solid;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .ChordPickerTableRows .Label2 {
+    text-align: center;
+    color: #AAAAAA;
+    font-size: 14px;
+    font-family: Karla;
+    font-weight: 600;
+    text-transform: capitalize;
+    line-height: 16px;
+    word-wrap: break-word;
+  }
+
+  .ChordPickerTableRows .Label3,
+  .ChordPickerTableRows .Label4 {
+    text-align: center;
+    color: #999999;
+    font-size: 13px;
+    font-family: Karla;
+    font-weight: 400;
+    text-transform: capitalize;
+    line-height: 16px;
+    word-wrap: break-word;
+  }
+</style>
+
+<div data-layer="Chord Picker" class="ChordPicker">
+  <div data-layer="Chord Picker Title" class="ChordPickerTitle">
+    <div data-layer="Chord Picker" class="ChordPicker">Chord Picker</div>
+    <div data-svg-wrapper data-layer="Filter Icon" class="FilterIcon">
+      <svg width="12" height="9" viewBox="0 0 12 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0.46875C0 0.34443 0.0493861 0.225201 0.137294 0.137294C0.225201 0.0493861 0.34443 0 0.46875 0H10.7812C10.9056 0 11.0248 0.0493861 11.1127 0.137294C11.2006 0.225201 11.25 0.34443 11.25 0.46875C11.25 0.59307 11.2006 0.712299 11.1127 0.800206C11.0248 0.888114 10.9056 0.9375 10.7812 0.9375H0.46875C0.34443 0.9375 0.225201 0.888114 0.137294 0.800206C0.0493861 0.712299 0 0.59307 0 0.46875ZM1.875 4.21875C1.875 4.09443 1.92439 3.9752 2.01229 3.88729C2.1002 3.79939 2.21943 3.75 2.34375 3.75H8.90625C9.03057 3.75 9.1498 3.79939 9.23771 3.88729C9.32561 3.9752 9.375 4.09443 9.375 4.21875C9.375 4.34307 9.32561 4.4623 9.23771 4.55021C9.1498 4.63811 9.03057 4.6875 8.90625 4.6875H2.34375C2.21943 4.6875 2.1002 4.63811 2.01229 4.55021C1.92439 4.4623 1.875 4.34307 1.875 4.21875ZM3.75 7.96875C3.75 7.84443 3.79939 7.7252 3.88729 7.63729C3.9752 7.54939 4.09443 7.5 4.21875 7.5H7.03125C7.15557 7.5 7.2748 7.54939 7.36271 7.63729C7.45061 7.7252 7.5 7.84443 7.5 7.96875C7.5 8.09307 7.45061 8.2123 7.36271 8.30021C7.2748 8.38811 7.15557 8.4375 7.03125 8.4375H4.21875C4.09443 8.4375 3.9752 8.38811 3.88729 8.30021C3.79939 8.2123 3.75 8.09307 3.75 7.96875Z" fill="#B2B2B2"/>
+      </svg>
+    </div>
+  </div>
+  <div data-layer="Chord Picker Tabs" class="ChordPickerTabs">
+    <div data-layer="Tab 1" class="Tab1">
+      <div data-layer="Label 1" class="Label1">Closed</div>
+    </div>
+    <div data-layer="Tab 2" class="Tab2">
+      <div data-layer="Label 2" class="Label2">Drop 2</div>
+    </div>
+    <div data-layer="Tab 3" class="Tab3">
+      <div data-layer="Label 3" class="Label3">Drop 3</div>
+    </div>
+  </div>
+  <div data-layer="Chord Picker Table Rows" class="ChordPickerTableRows">
+    <div data-layer="Available Chord Row 1" class="AvailableChordRow1">
+      <div data-layer="Label 2" class="Label2">Chord</div>
+      <div data-layer="Label 3" class="Label3">Inversion</div>
+      <div data-layer="Label 4" class="Label4">Order</div>
+      <div data-svg-wrapper data-layer="Icons" class="Icons">
+        <svg width="57" height="9" viewBox="0 0 57 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3.38777 5.66297L0.5 8.5M1.38854 3.47408L5.47273 7.48652L6.22666 6.74584L6.05206 5.09294L8.5 3.05333L5.90101 0.5L3.82448 2.90493L2.14247 2.7334L1.38854 3.47408Z" stroke="#929292" stroke-opacity="0.52" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M50.5 2.9C50.934 2.9 51.3502 3.06857 51.6571 3.36863C51.964 3.66869 52.1364 4.07565 52.1364 4.5C52.1364 4.92435 51.964 5.33131 51.6571 5.63137C51.3502 5.93143 50.934 6.1 50.5 6.1C50.066 6.1 49.6498 5.93143 49.3429 5.63137C49.036 5.33131 48.8636 4.92435 48.8636 4.5C48.8636 4.07565 49.036 3.66869 49.3429 3.36863C49.6498 3.06857 50.066 2.9 50.5 2.9ZM50.5 0.5C53.2273 0.5 55.5564 2.15867 56.5 4.5C55.5564 6.84133 53.2273 8.5 50.5 8.5C47.7727 8.5 45.4436 6.84133 44.5 4.5C45.4436 2.15867 47.7727 0.5 50.5 0.5ZM45.6891 4.5C46.13 5.38016 46.8145 6.12173 47.665 6.6404C48.5154 7.15907 49.4977 7.43404 50.5 7.43404C51.5023 7.43404 52.4846 7.15907 53.335 6.6404C54.1855 6.12173 54.87 5.38016 55.3109 4.5C54.87 3.61984 54.1855 2.87827 53.335 2.3596C52.4846 1.84093 51.5023 1.56596 50.5 1.56596C49.4977 1.56596 48.5154 1.84093 47.665 2.3596C46.8145 2.87827 46.13 3.61984 45.6891 4.5Z" fill="#929292" fill-opacity="0.52"/>
+        </svg>
+      </div>
+    </div>
+    <div data-layer="Available Chord Row 2" class="AvailableChordRow2">
+      <div data-layer="Label 2" class="Label2">Chord</div>
+      <div data-layer="Label 3" class="Label3">Inversion</div>
+      <div data-layer="Label 4" class="Label4">Order</div>
+      <div data-svg-wrapper data-layer="Icons" class="Icons">
+        <svg width="57" height="9" viewBox="0 0 57 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3.38777 5.66297L0.5 8.5M1.38854 3.47408L5.47273 7.48652L6.22666 6.74584L6.05206 5.09294L8.5 3.05333L5.90101 0.5L3.82448 2.90493L2.14247 2.7334L1.38854 3.47408Z" stroke="#929292" stroke-opacity="0.52" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M50.5 2.9C50.934 2.9 51.3502 3.06857 51.6571 3.36863C51.964 3.66869 52.1364 4.07565 52.1364 4.5C52.1364 4.92435 51.964 5.33131 51.6571 5.63137C51.3502 5.93143 50.934 6.1 50.5 6.1C50.066 6.1 49.6498 5.93143 49.3429 5.63137C49.036 5.33131 48.8636 4.92435 48.8636 4.5C48.8636 4.07565 49.036 3.66869 49.3429 3.36863C49.6498 3.06857 50.066 2.9 50.5 2.9ZM50.5 0.5C53.2273 0.5 55.5564 2.15867 56.5 4.5C55.5564 6.84133 53.2273 8.5 50.5 8.5C47.7727 8.5 45.4436 6.84133 44.5 4.5C45.4436 2.15867 47.7727 0.5 50.5 0.5ZM45.6891 4.5C46.13 5.38016 46.8145 6.12173 47.665 6.6404C48.5154 7.15907 49.4977 7.43404 50.5 7.43404C51.5023 7.43404 52.4846 7.15907 53.335 6.6404C54.1855 6.12173 54.87 5.38016 55.3109 4.5C54.87 3.61984 54.1855 2.87827 53.335 2.3596C52.4846 1.84093 51.5023 1.56596 50.5 1.56596C49.4977 1.56596 48.5154 1.84093 47.665 2.3596C46.8145 2.87827 46.13 3.61984 45.6891 4.5Z" fill="#929292" fill-opacity="0.52"/>
+        </svg>
+      </div>
+    </div>
+    <div data-layer="Available Chord Row 7" class="AvailableChordRow7">
+      <div data-layer="Label 2" class="Label2">Chord</div>
+      <div data-layer="Label 3" class="Label3">Inversion</div>
+      <div data-layer="Label 4" class="Label4">Order</div>
+      <div data-svg-wrapper data-layer="Icons" class="Icons">
+        <svg width="57" height="9" viewBox="0 0 57 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3.38777 5.66297L0.5 8.5M1.38854 3.47408L5.47273 7.48652L6.22666 6.74584L6.05206 5.09294L8.5 3.05333L5.90101 0.5L3.82448 2.90493L2.14247 2.7334L1.38854 3.47408Z" stroke="#929292" stroke-opacity="0.52" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M50.5 2.9C50.934 2.9 51.3502 3.06857 51.6571 3.36863C51.964 3.66869 52.1364 4.07565 52.1364 4.5C52.1364 4.92435 51.964 5.33131 51.6571 5.63137C51.3502 5.93143 50.934 6.1 50.5 6.1C50.066 6.1 49.6498 5.93143 49.3429 5.63137C49.036 5.33131 48.8636 4.92435 48.8636 4.5C48.8636 4.07565 49.036 3.66869 49.3429 3.36863C49.6498 3.06857 50.066 2.9 50.5 2.9ZM50.5 0.5C53.2273 0.5 55.5564 2.15867 56.5 4.5C55.5564 6.84133 53.2273 8.5 50.5 8.5C47.7727 8.5 45.4436 6.84133 44.5 4.5C45.4436 2.15867 47.7727 0.5 50.5 0.5ZM45.6891 4.5C46.13 5.38016 46.8145 6.12173 47.665 6.6404C48.5154 7.15907 49.4977 7.43404 50.5 7.43404C51.5023 7.43404 52.4846 7.15907 53.335 6.6404C54.1855 6.12173 54.87 5.38016 55.3109 4.5C54.87 3.61984 54.1855 2.87827 53.335 2.3596C52.4846 1.84093 51.5023 1.56596 50.5 1.56596C49.4977 1.56596 48.5154 1.84093 47.665 2.3596C46.8145 2.87827 46.13 3.61984 45.6891 4.5Z" fill="#929292" fill-opacity="0.52"/>
+        </svg>
+      </div>
+    </div>
+    <div data-layer="Available Chord Row 4" class="AvailableChordRow4">
+      <div data-layer="Label 2" class="Label2">Chord</div>
+      <div data-layer="Label 3" class="Label3">Inversion</div>
+      <div data-layer="Label 4" class="Label4">Order</div>
+      <div data-svg-wrapper data-layer="Icons" class="Icons">
+        <svg width="57" height="9" viewBox="0 0 57 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3.38777 5.66297L0.5 8.5M1.38854 3.47408L5.47273 7.48652L6.22666 6.74584L6.05206 5.09294L8.5 3.05333L5.90101 0.5L3.82448 2.90493L2.14247 2.7334L1.38854 3.47408Z" stroke="#929292" stroke-opacity="0.52" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M50.5 2.9C50.934 2.9 51.3502 3.06857 51.6571 3.36863C51.964 3.66869 52.1364 4.07565 52.1364 4.5C52.1364 4.92435 51.964 5.33131 51.6571 5.63137C51.3502 5.93143 50.934 6.1 50.5 6.1C50.066 6.1 49.6498 5.93143 49.3429 5.63137C49.036 5.33131 48.8636 4.92435 48.8636 4.5C48.8636 4.07565 49.036 3.66869 49.3429 3.36863C49.6498 3.06857 50.066 2.9 50.5 2.9ZM50.5 0.5C53.2273 0.5 55.5564 2.15867 56.5 4.5C55.5564 6.84133 53.2273 8.5 50.5 8.5C47.7727 8.5 45.4436 6.84133 44.5 4.5C45.4436 2.15867 47.7727 0.5 50.5 0.5ZM45.6891 4.5C46.13 5.38016 46.8145 6.12173 47.665 6.6404C48.5154 7.15907 49.4977 7.43404 50.5 7.43404C51.5023 7.43404 52.4846 7.15907 53.335 6.6404C54.1855 6.12173 54.87 5.38016 55.3109 4.5C54.87 3.61984 54.1855 2.87827 53.335 2.3596C52.4846 1.84093 51.5023 1.56596 50.5 1.56596C49.4977 1.56596 48.5154 1.84093 47.665 2.3596C46.8145 2.87827 46.13 3.61984 45.6891 4.5Z" fill="#929292" fill-opacity="0.52"/>
+        </svg>
+      </div>
+    </div>
+    <div data-layer="Available Chord Row 5" class="AvailableChordRow5">
+      <div data-layer="Label 2" class="Label2">Chord</div>
+      <div data-layer="Label 3" class="Label3">Inversion</div>
+      <div data-layer="Label 4" class="Label4">Order</div>
+      <div data-svg-wrapper data-layer="Icons" class="Icons">
+        <svg width="57" height="9" viewBox="0 0 57 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3.38777 5.66297L0.5 8.5M1.38854 3.47408L5.47273 7.48652L6.22666 6.74584L6.05206 5.09294L8.5 3.05333L5.90101 0.5L3.82448 2.90493L2.14247 2.7334L1.38854 3.47408Z" stroke="#929292" stroke-opacity="0.52" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M50.5 2.9C50.934 2.9 51.3502 3.06857 51.6571 3.36863C51.964 3.66869 52.1364 4.07565 52.1364 4.5C52.1364 4.92435 51.964 5.33131 51.6571 5.63137C51.3502 5.93143 50.934 6.1 50.5 6.1C50.066 6.1 49.6498 5.93143 49.3429 5.63137C49.036 5.33131 48.8636 4.92435 48.8636 4.5C48.8636 4.07565 49.036 3.66869 49.3429 3.36863C49.6498 3.06857 50.066 2.9 50.5 2.9ZM50.5 0.5C53.2273 0.5 55.5564 2.15867 56.5 4.5C55.5564 6.84133 53.2273 8.5 50.5 8.5C47.7727 8.5 45.4436 6.84133 44.5 4.5C45.4436 2.15867 47.7727 0.5 50.5 0.5ZM45.6891 4.5C46.13 5.38016 46.8145 6.12173 47.665 6.6404C48.5154 7.15907 49.4977 7.43404 50.5 7.43404C51.5023 7.43404 52.4846 7.15907 53.335 6.6404C54.1855 6.12173 54.87 5.38016 55.3109 4.5C54.87 3.61984 54.1855 2.87827 53.335 2.3596C52.4846 1.84093 51.5023 1.56596 50.5 1.56596C49.4977 1.56596 48.5154 1.84093 47.665 2.3596C46.8145 2.87827 46.13 3.61984 45.6891 4.5Z" fill="#929292" fill-opacity="0.52"/>
+        </svg>
+      </div>
+    </div>
+    <div data-layer="Available Chord Row 6" class="AvailableChordRow6">
+      <div data-layer="Label 2" class="Label2">Chord</div>
+      <div data-layer="Label 3" class="Label3">Inversion</div>
+      <div data-layer="Label 4" class="Label4">Order</div>
+      <div data-svg-wrapper data-layer="Icons" class="Icons">
+        <svg width="57" height="9" viewBox="0 0 57 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3.38777 5.66297L0.5 8.5M1.38854 3.47408L5.47273 7.48652L6.22666 6.74584L6.05206 5.09294L8.5 3.05333L5.90101 0.5L3.82448 2.90493L2.14247 2.7334L1.38854 3.47408Z" stroke="#929292" stroke-opacity="0.52" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M50.5 2.9C50.934 2.9 51.3502 3.06857 51.6571 3.36863C51.964 3.66869 52.1364 4.07565 52.1364 4.5C52.1364 4.92435 51.964 5.33131 51.6571 5.63137C51.3502 5.93143 50.934 6.1 50.5 6.1C50.066 6.1 49.6498 5.93143 49.3429 5.63137C49.036 5.33131 48.8636 4.92435 48.8636 4.5C48.8636 4.07565 49.036 3.66869 49.3429 3.36863C49.6498 3.06857 50.066 2.9 50.5 2.9ZM50.5 0.5C53.2273 0.5 55.5564 2.15867 56.5 4.5C55.5564 6.84133 53.2273 8.5 50.5 8.5C47.7727 8.5 45.4436 6.84133 44.5 4.5C45.4436 2.15867 47.7727 0.5 50.5 0.5ZM45.6891 4.5C46.13 5.38016 46.8145 6.12173 47.665 6.6404C48.5154 7.15907 49.4977 7.43404 50.5 7.43404C51.5023 7.43404 52.4846 7.15907 53.335 6.6404C54.1855 6.12173 54.87 5.38016 55.3109 4.5C54.87 3.61984 54.1855 2.87827 53.335 2.3596C52.4846 1.84093 51.5023 1.56596 50.5 1.56596C49.4977 1.56596 48.5154 1.84093 47.665 2.3596C46.8145 2.87827 46.13 3.61984 45.6891 4.5Z" fill="#929292" fill-opacity="0.52"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>

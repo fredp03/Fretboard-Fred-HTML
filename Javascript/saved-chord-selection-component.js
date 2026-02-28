@@ -67,11 +67,22 @@ class SavedChordSelectionComponent extends HTMLElement {
         if (!card) return;
 
         card.addEventListener('click', () => {
-            if (this.hasAttribute('selected')) {
-                this.removeAttribute('selected');
-            } else {
-                this.setAttribute('selected', '');
-            }
+            // Dispatch event for external management (main script handles selection + scale apply)
+            this.dispatchEvent(new CustomEvent('saved-chord-selected', {
+                bubbles: true,
+                composed: true,
+                detail: { chordData: this._savedChordData || null }
+            }));
+        });
+
+        // Shift + double-click → request removal of this saved chord
+        card.addEventListener('dblclick', (e) => {
+            if (!e.shiftKey) return;
+            e.stopPropagation();
+            this.dispatchEvent(new CustomEvent('saved-chord-remove-request', {
+                bubbles: true,
+                composed: true
+            }));
         });
     }
 

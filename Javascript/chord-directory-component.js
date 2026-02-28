@@ -377,11 +377,28 @@ class ChordDirectoryComponent extends HTMLElement {
                 document.dispatchEvent(new CustomEvent('triad-preview-end'));
             });
 
-            // Click peek icon → lock voicing on fretboard
-            el.addEventListener('peek-click', () => {
-                // End any active preview first
-                document.dispatchEvent(new CustomEvent('triad-preview-end'));
-                document.dispatchEvent(new CustomEvent('triad-select', { detail: { voicing: result.voicingMap, additive: false } }));
+            // Click peek icon → lock voicing on fretboard (shift-click → save chord)
+            el.addEventListener('peek-click', (e) => {
+                if (e.detail && e.detail.shiftKey) {
+                    // Shift-click: save as a saved chord
+                    const scaleSelector = document.querySelector('scale-selector');
+                    const scaleRoot = scaleSelector ? (scaleSelector.getAttribute('root') || 'C') : 'C';
+                    const scaleName = scaleSelector ? (scaleSelector.getAttribute('name') || 'Major') : 'Major';
+                    document.dispatchEvent(new CustomEvent('chord-save-request', {
+                        detail: {
+                            voicingMap: result.voicingMap,
+                            chordName: `${result.displayRoot} ${result.displayQuality}`,
+                            voicingType: this._activeTab,
+                            inversion: result.displayInversion,
+                            scaleRoot,
+                            scaleName,
+                        }
+                    }));
+                } else {
+                    // Normal click: lock voicing on fretboard
+                    document.dispatchEvent(new CustomEvent('triad-preview-end'));
+                    document.dispatchEvent(new CustomEvent('triad-select', { detail: { voicing: result.voicingMap, additive: false } }));
+                }
             });
 
             container.appendChild(el);

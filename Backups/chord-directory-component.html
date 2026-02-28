@@ -1,0 +1,75 @@
+<template id="chord-directory-template">
+    <style>
+        :host {
+            display: block;
+            --cd-surface-1: #262626;
+            --cd-surface-2: #2e2e2e;
+            --cd-surface-3: #222222;
+            --cd-stroke-soft: rgba(255, 255, 255, 0.06);
+        }
+        .ChordDirectoryWrapper {
+            width: fit-content;
+            min-width: min(100%);
+            max-width: 100%;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            /* border-radius: 16px;
+            border: 1px solid var(--cd-stroke-soft);
+            box-shadow: 0 2px 4.1px 0 rgba(0, 0, 0, 0.81);
+            background: linear-gradient(180deg, #323232 0%, var(--cd-surface-1) 45%, var(--cd-surface-3) 100%); */
+            overflow: hidden;
+        }
+        notes-and-inversions:last-of-type {
+            --notes-border-bottom: none;
+        }
+        .RowsContainer {
+            padding: 2px 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(0, 0, 0, 0.05));
+            max-height: 264px;
+            overflow-y: auto;
+            scrollbar-color: rgba(120, 120, 120, 0.4) transparent;
+            scrollbar-width: thin;
+        }
+        .RowsContainer::-webkit-scrollbar {
+            width: 6px;
+        }
+        .RowsContainer::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .RowsContainer::-webkit-scrollbar-thumb {
+            background: #1f1f1f;
+            border-radius: 999px;
+        }
+        .RowsContainer::-webkit-scrollbar-thumb:hover {
+            background: #202020;
+        }
+        .TabBar {
+            display: flex;
+            flex-wrap:nowrap;
+            gap: 5cqw;
+            min-height: var(--cd-header-height);
+            padding: 0 14px;
+            justify-content: flex-start;
+            align-items: center;
+            align-self: stretch;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(180deg, #323232 0%, #2a2a2a 100%);
+            box-shadow:
+                -1px 1px 2px rgba(20, 20, 20, 0.24) inset,
+                1px -1px 2px rgba(20, 20, 20, 0.20) inset,
+                -1px -1px 2px rgba(60, 60, 60, 0.55) inset,
+                0 1px 0 rgba(255, 255, 255, 0.03) inset,
+                0 -1px 0 rgba(0, 0, 0, 0.20) inset;
+        }
+    </style>
+
+    <div class="ChordDirectoryWrapper">
+
+        <div class="TabBar" role="tablist"></div>
+
+        <div class="RowsContainer"></div>
+
+    </div>
+</template>

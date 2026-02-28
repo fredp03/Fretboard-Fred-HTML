@@ -1,0 +1,239 @@
+<template id="chord-directory-v2-template">
+    <style>
+        :host {
+            display: block;
+        }
+
+    </style>
+
+    <style>
+        :host {
+            display: block;
+        }
+
+        .ChordDirectoryTableRows {
+            display: flex;
+            width: 100%;
+            padding: 10px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            border: 1px solid #DFDFDF;
+            background: #2F2F2F;
+            box-shadow: 6px 6px 12px 0 rgba(19, 19, 19, 0.20), -6px -6px 12px 0 rgba(19, 19, 19, 0.20), 6px -6px 12px 0 rgba(75, 75, 75, 0.90), -6px 6px 15px 0 rgba(19, 19, 19, 0.90);
+        }
+
+        .ChordDirectoryV2 {
+            display: flex;
+            width: 802px;
+            height: 450px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .AvailableChordRow {
+            display: flex;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.21);
+            padding: 15px 20px;
+            justify-content: space-between;
+            align-items: center;
+            align-self: stretch;
+        }
+
+        .Chord {
+            color: #AAA;
+            text-align: center;
+            font-feature-settings: 'liga' off, 'clig' off;
+            font-family: var(--Font, Karla);
+            font-size: var(--H1-Size, 14px);
+            font-style: normal;
+            font-weight: 600;
+            line-height: 16px; /* 114.286% */
+            text-transform: capitalize;
+        }
+
+        .Inversion,
+        .Order {
+            color: #999;
+            text-align: center;
+            font-feature-settings: 'liga' off, 'clig' off;
+            font-family: var(--Font, Karla);
+            font-size: var(--H1-Size, 13px);
+            font-style: normal;
+            font-weight: 400;
+            line-height: 16px; /* 123.077% */
+            text-transform: capitalize;
+        }
+
+        .Icons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 36px;
+        }
+
+        .PinIcon {
+            content: url("data:image/svg+xml,%3Csvg width='9' height='9' viewBox='0 0 9 9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3.38777 5.66297L0.5 8.5M1.38854 3.47408L5.47273 7.48652L6.22666 6.74584L6.05206 5.09294L8.5 3.05333L5.90101 0.5L3.82448 2.90493L2.14247 2.7334L1.38854 3.47408Z' stroke='%23929292' stroke-opacity='0.52' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        }
+
+        .PeekIcon {
+            content: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 2.4C6.43399 2.4 6.85021 2.56857 7.15708 2.86863C7.46396 3.16869 7.63636 3.57565 7.63636 4C7.63636 4.42435 7.46396 4.83131 7.15708 5.13137C6.85021 5.43143 6.43399 5.6 6 5.6C5.56601 5.6 5.14979 5.43143 4.84292 5.13137C4.53604 4.83131 4.36364 4.42435 4.36364 4C4.36364 3.57565 4.53604 3.16869 4.84292 2.86863C5.14979 2.56857 5.56601 2.4 6 2.4ZM6 0C8.72727 0 11.0564 1.65867 12 4C11.0564 6.34133 8.72727 8 6 8C3.27273 8 0.943636 6.34133 0 4C0.943636 1.65867 3.27273 0 6 0ZM1.18909 4C1.62996 4.88016 2.31453 5.62173 3.16499 6.1404C4.01545 6.65907 4.99767 6.93404 6 6.93404C7.00233 6.93404 7.98455 6.65907 8.83501 6.1404C9.68547 5.62173 10.37 4.88016 10.8109 4C10.37 3.11984 9.68547 2.37827 8.83501 1.8596C7.98455 1.34093 7.00233 1.06596 6 1.06596C4.99767 1.06596 4.01545 1.34093 3.16499 1.8596C2.31453 2.37827 1.62996 3.11984 1.18909 4Z' fill='%23929292' fill-opacity='0.52'/%3E%3C/svg%3E");
+        }
+
+        .ChordPickerTabs {
+            display: flex;
+            padding: 28px 20px;
+            justify-content: space-between;
+            align-items: center;
+            align-self: stretch;
+        }
+
+        .TabSelected {
+            display: flex;
+            padding: 9px 20px;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            align-self: stretch;
+            border-radius: 10px;
+            border: 1px solid #A1A1A1;
+        }
+
+        .TabLabelSelected {
+            color: #B6B6B6;
+            text-align: center;
+            font-feature-settings: 'liga' off, 'clig' off;
+            font-family: var(--Font, Karla);
+            font-size: var(--H1-Size, 14px);
+            font-style: normal;
+            font-weight: 400;
+            line-height: 16px; /* 114.286% */
+            text-transform: capitalize;
+        }
+        .Tab {
+            display: flex;
+            padding: 9px 20px;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            align-self: stretch;
+            border-radius: 10px;
+            border: 1px solid #434343;
+        }
+
+        .TabLabel {
+            color: #B6B6B6;
+            text-align: center;
+            font-feature-settings: 'liga' off, 'clig' off;
+            font-family: var(--Font, Karla);
+            font-size: var(--H1-Size, 14px);
+            font-style: normal;
+            font-weight: 400;
+            line-height: 16px; /* 114.286% */
+            text-transform: capitalize;
+        }
+
+        .ChordPickerTitle {
+            display: flex;
+            padding: 10px;
+            justify-content: center;
+            align-items: center;
+            gap: 35px;
+            
+        }
+
+        .Title {
+            color: #B2B2B2;
+            font-family: var(--Font, Karla);
+            font-size: var(--H1-Size, 16px);
+            font-style: normal;
+            font-weight: 600;
+            line-height: normal;
+        }
+
+        .FilterIcon {
+            content: url("data:image/svg+xml,%3Csvg width='12' height='9' viewBox='0 0 12 9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0.46875C0 0.34443 0.0493861 0.225201 0.137294 0.137294C0.225201 0.0493861 0.34443 0 0.46875 0H10.7812C10.9056 0 11.0248 0.0493861 11.1127 0.137294C11.2006 0.225201 11.25 0.34443 11.25 0.46875C11.25 0.59307 11.2006 0.712299 11.1127 0.800206C11.0248 0.888114 10.9056 0.9375 10.7812 0.9375H0.46875C0.34443 0.9375 0.225201 0.888114 0.137294 0.800206C0.0493861 0.712299 0 0.59307 0 0.46875ZM1.875 4.21875C1.875 4.09443 1.92439 3.9752 2.01229 3.88729C2.1002 3.79939 2.21943 3.75 2.34375 3.75H8.90625C9.03057 3.75 9.1498 3.79939 9.23771 3.88729C9.32561 3.9752 9.375 4.09443 9.375 4.21875C9.375 4.34307 9.32561 4.4623 9.23771 4.55021C9.1498 4.63811 9.03057 4.6875 8.90625 4.6875H2.34375C2.21943 4.6875 2.1002 4.63811 2.01229 4.55021C1.92439 4.4623 1.875 4.34307 1.875 4.21875ZM3.75 7.96875C3.75 7.84443 3.79939 7.7252 3.88729 7.63729C3.9752 7.54939 4.09443 7.5 4.21875 7.5H7.03125C7.15557 7.5 7.2748 7.54939 7.36271 7.63729C7.45061 7.7252 7.5 7.84443 7.5 7.96875C7.5 8.09307 7.45061 8.2123 7.36271 8.30021C7.2748 8.38811 7.15557 8.4375 7.03125 8.4375H4.21875C4.09443 8.4375 3.9752 8.38811 3.88729 8.30021C3.79939 8.2123 3.75 8.09307 3.75 7.96875Z' fill='%23B2B2B2'/%3E%3C/svg%3E");
+        }
+
+
+    </style>
+
+    <div class="ChordDirectoryV2">
+
+        <div class="ChordPickerTitle">
+            <div class="Title">Chord Picker</div>
+            <div class="FilterIcon"></div>
+        </div>
+
+        <div class="ChordPickerTabs">
+            <div class="TabSelected">
+                <div class="TabLabelSelected">Closed</div>
+            </div>
+            <div class="Tab">
+                <div class="TabLabel">Drop 2</div>
+            </div>
+            <div class="Tab">
+                <div class="TabLabel">Drop 3</div>
+            </div>
+        </div>
+
+        <div class="ChordDirectoryTableRows">
+            
+            <div class="AvailableChordRow">
+
+                <div class="Chord">Chord</div>
+                <div class="Inversion">Inversion</div>
+                <div class="Order">Order</div>
+                <div class="Icons">
+
+                    <div class="PinIcon"></div>
+                    <div class="PeekIcon"></div>
+
+                </div>
+            </div>
+            <div class="AvailableChordRow">
+
+                <div class="Chord">Chord</div>
+                <div class="Inversion">Inversion</div>
+                <div class="Order">Order</div>
+                <div class="Icons">
+
+                    <div class="PinIcon"></div>
+                    <div class="PeekIcon"></div>
+
+                </div>
+            </div>
+            <div class="AvailableChordRow">
+
+                <div class="Chord">Chord</div>
+                <div class="Inversion">Inversion</div>
+                <div class="Order">Order</div>
+                <div class="Icons">
+
+                    <div class="PinIcon"></div>
+                    <div class="PeekIcon"></div>
+
+                </div>
+            </div>
+            <div class="AvailableChordRow">
+
+                <div class="Chord">Chord</div>
+                <div class="Inversion">Inversion</div>
+                <div class="Order">Order</div>
+                <div class="Icons">
+
+                    <div class="PinIcon"></div>
+                    <div class="PeekIcon"></div>
+
+                </div>
+            </div>
+        </div> 
+
+    </div>
+
+
+</template>

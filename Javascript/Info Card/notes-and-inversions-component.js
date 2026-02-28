@@ -122,7 +122,11 @@ class NotesAndInversionsComponent extends HTMLElement {
         if (peekIcon) {
             peekIcon.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.dispatchEvent(new CustomEvent('peek-click', { bubbles: true, composed: true }));
+                this.dispatchEvent(new CustomEvent('peek-click', {
+                    bubbles: true,
+                    composed: true,
+                    detail: { shiftKey: e.shiftKey }
+                }));
             });
         }
     }

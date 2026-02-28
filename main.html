@@ -140,9 +140,10 @@
         height: 100%;
     }
     .ChordDirectory{
-        border-radius: 13px;
-        background: #262626;
-        box-shadow: 0 2px 4.1px 0 rgba(0, 0, 0, 0.81);
+
+        border-radius: 6px;
+        border: 1px solid rgba(0, 0, 0, 0.48);
+        
     }
 
     .SavedSelectionsContainer {
@@ -165,6 +166,16 @@
         gap: 61px;
 
     }
+    .BottomArea {
+        display: flex;
+        padding: 40px 80px;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex: 1 0 0;
+        align-self: stretch;
+    }
+
+
 
 </style>
 
@@ -194,17 +205,126 @@
 
     <div class="SavedSelectionsContainer">
 
-        <div class="SavedChords">
+        <div class="SavedChords" id="saved-chords-list"></div>
 
-            <saved-chord-selection></saved-chord-selection>
-            <saved-chord-selection></saved-chord-selection>
-            <saved-chord-selection></saved-chord-selection>
-            <saved-chord-selection></saved-chord-selection>
+    </div>
+
+<!-- Bottom Container - Chord Area and Info -->
+
+    <div class="BottomArea">
+
+        <div class="ChordArea">
+
+            <chord-directory class="ChordDirectory"></chord-directory>
 
         </div>
+        
     </div>
 
 
+<script>
+    (function () {
+        let selectedEl = null;       // currently selected saved-chord-selection element
+        let preSelectScale = null;   // { root, name } captured before any chord was selected
+
+        function getScaleSelector() {
+            return document.querySelector('scale-selector');
+        }
+
+        function applyScale(root, name) {
+            const sel = getScaleSelector();
+            if (!sel) return;
+            const currentRoot = sel.getAttribute('root');
+            const currentName = sel.getAttribute('name');
+            if (currentRoot !== root) {
+                sel.setAttribute('root', root);
+                localStorage.setItem('scale-selector-root', root);
+                sel.dispatchEvent(new CustomEvent('change', {
+                    bubbles: true,
+                    detail: { field: 'root', value: root }
+                }));
+            }
+            if (currentName !== name) {
+                sel.setAttribute('name', name);
+                localStorage.setItem('scale-selector-name', name);
+                sel.dispatchEvent(new CustomEvent('change', {
+                    bubbles: true,
+                    detail: { field: 'name', value: name }
+                }));
+            }
+        }
+
+        function deselectCurrent(revertScale) {
+            if (selectedEl) {
+                selectedEl.removeAttribute('selected');
+                selectedEl = null;
+            }
+            if (revertScale && preSelectScale) {
+                applyScale(preSelectScale.root, preSelectScale.name);
+                preSelectScale = null;
+            }
+        }
+
+        // Handle saving a chord via shift-click on the peak icon
+        document.addEventListener('chord-save-request', (e) => {
+            const { voicingMap, chordName, voicingType, inversion, scaleRoot, scaleName } = e.detail;
+
+            const el = document.createElement('saved-chord-selection');
+            el.setAttribute('chord-name', chordName);
+            el.setAttribute('voicing', voicingType);
+            el.setAttribute('inversion', inversion || 'Root');
+            el._savedChordData = { voicingMap, scaleRoot, scaleName };
+
+            el.addEventListener('saved-chord-selected', () => {
+                if (selectedEl === el) {
+                    // Clicking the already-selected chord: deselect and revert scale
+                    deselectCurrent(true);
+                    return;
+                }
+
+                if (!selectedEl) {
+                    // No chord is currently selected — capture pre-selection scale
+                    const sel = getScaleSelector();
+                    preSelectScale = sel
+                        ? { root: sel.getAttribute('root') || 'C', name: sel.getAttribute('name') || 'Major' }
+                        : null;
+                }
+
+                // Deselect previous without reverting scale
+                if (selectedEl) selectedEl.removeAttribute('selected');
+
+                el.setAttribute('selected', '');
+                selectedEl = el;
+
+                // Apply voicing to fretboard
+                document.dispatchEvent(new CustomEvent('triad-preview-end'));
+                document.dispatchEvent(new CustomEvent('triad-select', {
+                    detail: { voicing: voicingMap, additive: false }
+                }));
+
+                // Apply saved scale
+                applyScale(scaleRoot, scaleName);
+            });
+
+            el.addEventListener('saved-chord-remove-request', () => {
+                const wasSelected = selectedEl === el;
+                if (wasSelected) deselectCurrent(true);
+                el.remove();
+            });
+
+            const container = document.getElementById('saved-chords-list');
+            if (container) container.appendChild(el);
+        });
+
+        // Escape: deselect current saved chord and revert scale
+        window.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            if (e.defaultPrevented) return;   // Already handled (e.g. scale key-viewer closed it)
+            if (!selectedEl) return;
+            deselectCurrent(true);
+        }, { capture: true });
+    })();
+</script>
 
 </body>
 
