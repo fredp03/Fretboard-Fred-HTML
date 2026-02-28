@@ -1,0 +1,81 @@
+<template id="saved-chord-selection-template">
+    <style>
+        :host {
+            display: block;
+            cursor: pointer;
+        }
+
+        .SavedChordCard {
+            display: inline-flex;
+            padding: 10px 15px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+            border-radius: 6px;
+            border: 1.5px solid #7A7A7A;
+            background: #3C3C3C;
+            transition: border-color 0.1s ease, background 0.1s ease;
+        }
+
+        :host([selected]) .SavedChordCard {
+            border-color: #a8a8a8;
+            background: #2B2B2B;
+        }
+
+        .VoicingAndInversion {
+            display: flex;
+            padding: 0 9px;
+            align-items: center;
+            gap: 11px;
+            align-self: stretch;
+        }
+
+        .InfoText {
+            color: #A1A1A1;
+            text-align: center;
+            font-feature-settings: 'liga' off, 'clig' off;
+            font-family: Karla;
+            font-size: 13px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 16px;
+            transition: color 0.1s ease;
+        }
+
+        :host([selected]) .InfoText {
+            color: #b2b2b2;
+            font-weight: 400;
+        }
+
+        .SavedChordName {
+            color: #A1A1A1;
+            font-feature-settings: 'liga' off, 'clig' off;
+            font-family: Karla;
+            font-size: 15px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 16px;
+            transition: color 0.1s ease;
+        }
+
+        :host([selected]) .SavedChordName {
+            color: #cdcdcd;
+        }
+
+    </style>
+
+    <div class="SavedChordCard">
+
+        <div class="SavedChordName" data-bind="chord-name">Chord Name</div>
+
+        <div class="VoicingAndInversion">
+
+            <div class="InfoText" data-bind="voicing">Voicing</div>
+            <div class="InfoText">-</div>
+            <div class="InfoText" data-bind="inversion">Inversion</div>
+           
+        </div>
+
+    </div>
+
+</template>
